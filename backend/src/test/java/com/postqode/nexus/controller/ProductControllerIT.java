@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ProductController.class)
 @Import(com.postqode.nexus.config.SecurityConfig.class)
-@SuppressWarnings("null")
+@SuppressWarnings({ "null", "unchecked" })
 public class ProductControllerIT {
 
         @Autowired
