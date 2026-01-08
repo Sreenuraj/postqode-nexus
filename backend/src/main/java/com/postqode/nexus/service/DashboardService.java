@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@SuppressWarnings("unchecked")
 public class DashboardService {
 
     private final ProductRepository productRepository;
@@ -66,7 +65,9 @@ public class DashboardService {
         LocalDateTime since = LocalDateTime.now().minusDays(days);
         List<Object[]> stats = activityLogRepository.getUserActivityStats(since);
 
-        return stats.stream().map(row -> {
+        List<UserActivity> activities = new ArrayList<>();
+
+        for (Object[] row : stats) {
             UUID userId = (UUID) row[0];
             Long count = (Long) row[1];
             LocalDateTime lastAction = (LocalDateTime) row[2];
@@ -74,12 +75,14 @@ public class DashboardService {
             User user = userRepository.findById(userId).orElse(null);
             String username = user != null ? user.getUsername() : "Unknown";
 
-            return UserActivity.builder()
+            activities.add(UserActivity.builder()
                     .username(username)
                     .actionCount(count.intValue())
                     .lastAction(lastAction.toString())
-                    .build();
-        }).collect(Collectors.toList());
+                    .build());
+        }
+
+        return activities;
     }
 
     @Transactional(readOnly = true)
