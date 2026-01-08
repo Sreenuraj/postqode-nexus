@@ -445,6 +445,7 @@ postqode-nexus/
 | 4.4 | Inventory management | Admin features | [Inventory Management](./application-functionality.md#43-inventory-management-admin-only) |
 | 4.5 | Dashboard | Mobile-optimized charts | [Dashboard Screen](./application-functionality.md#44-dashboard-screen-admin-only) |
 | 4.6 | Navigation | Stack/tab navigation | [Bottom Navigation (Mobile)](./application-functionality.md#52-bottom-navigation-mobile) |
+| 4.7 | Mobile startup script | scripts/start-mobile.sh | – |
 
 **Mobile-Specific References:**
 - **Breakpoints**: [Breakpoints](./application-functionality.md#101-breakpoints)
@@ -488,6 +489,7 @@ postqode-nexus/
 | 5.3 | CD pipelines | Deploy to demo/prod-demo |
 | 5.4 | Environment configs | .env files per environment |
 | 5.5 | Health checks | /health, /readiness, /version |
+| 5.6 | CI/CD scripts | scripts/build.sh, scripts/deploy.sh |
 
 **Functional Reference:**
 - [Logout - Session Timeout](./application-functionality.md#session-timeout) – Token expiry configuration
@@ -529,7 +531,8 @@ postqode-nexus/
 | 6.2 | API contract tests | REST & GraphQL validation | [Data Models](./application-functionality.md#6-data-models) |
 | 6.3 | UI smoke tests | Critical path automation | [Demo Scenarios](./application-functionality.md#12-demo-scenarios) |
 | 6.4 | Mobile tests | Cross-platform validation | [Responsive Behavior](./application-functionality.md#10-responsive-behavior) |
-| 6.5 | Demo reset scripts | One-command data reset | [Demo Data Set](./application-functionality.md#13-demo-data-set) |
+| 6.5 | Demo reset scripts | Improve reset-demo.sh for automation | [Demo Data Set](./application-functionality.md#13-demo-data-set) |
+| 6.6 | Update scripts README | Add new scripts to README.md | – |
 
 **Test Scenarios:**
 - **Admin Flow**: [Admin Demo Flow (5 minutes)](./application-functionality.md#121-admin-demo-flow-5-minutes)
@@ -571,6 +574,7 @@ postqode-nexus/
 | 7.3 | Documentation | API docs, user guides | [Application Overview](./application-functionality.md#1-application-overview) |
 | 7.4 | Final testing | End-to-end validation | [Primary User Flow](./application-functionality.md#3-primary-user-flow) |
 | 7.5 | Production deployment | Release to prod-demo | – |
+| 7.6 | Final scripts review | Update all scripts for production | – |
 
 **Quality Checklists:**
 - **Error Handling**: [Error Handling](./application-functionality.md#8-error-handling)
