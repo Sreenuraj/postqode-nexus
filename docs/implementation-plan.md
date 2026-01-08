@@ -197,11 +197,18 @@ postqode-nexus/
 | 1.4 | Mobile scaffold | React Native project |
 | 1.5 | Database setup | PostgreSQL schema, Flyway migrations |
 | 1.6 | Docker configuration | Dockerfiles, docker-compose.yml |
+| 1.7 | Setup scripts | scripts/setup.sh, scripts/reset-demo.sh |
+| 1.8 | Documentation | Development guide, Testing guide |
 
 **Functional References:**
 - [User Roles & Permissions](./application-functionality.md#2-user-roles--permissions) – Understand role structure for RBAC setup
 - [Data Models](./application-functionality.md#6-data-models) – Entity definitions for database schema
 - [Business Rules](./application-functionality.md#7-business-rules) – Constraints and validation logic
+
+**📝 Documentation Updates:**
+- [ ] Create/Update [Development Guide](./development-guide.md) with setup instructions
+- [ ] Create/Update [Testing Guide](./testing-guide.md) with Phase 1 tests
+
 
 #### 🧪 Phase 1 Testing
 
@@ -267,6 +274,56 @@ postqode-nexus/
 | 6 | Update status | PATCH `/api/v1/products/{id}/status` | Status changed, logged |
 | 7 | GraphQL query | POST `/graphql` with products query | Returns data |
 | 8 | Dashboard metrics | Query `dashboardMetrics` | Returns counts |
+
+**Sign-off**: [ ] All tests passing — Ready for Phase 2.1
+
+---
+
+### Phase 2.1: API Documentation (Week 4)
+
+> **📝 Documentation**: This phase enables interactive API testing via Swagger UI.
+
+| Task | Description | Deliverables |
+|------|-------------|--------------|
+| 2.1.1 | Add springdoc-openapi | Maven dependency |
+| 2.1.2 | Configure Swagger UI | OpenAPI 3.0 config |
+| 2.1.3 | Annotate controllers | @Operation, @ApiResponse |
+| 2.1.4 | Secure Swagger UI | JWT authentication |
+| 2.1.5 | Update docs | Update testing-guide.md |
+
+**Backend Dependency:**
+```xml
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.3.0</version>
+</dependency>
+```
+
+**Access URL:** `http://localhost:8080/swagger-ui.html`
+
+#### 🧪 Phase 2.1 Testing
+
+| Test Type | Test | Command/Steps |
+|-----------|------|---------------|
+| Manual | Swagger UI loads | Visit `/swagger-ui.html` |
+| Manual | Auth endpoint visible | Expand `/api/v1/auth` |
+| Manual | Try login | Execute login, get token |
+| Manual | Authorize | Click Authorize, paste token |
+| Manual | Try products | Execute GET products |
+
+#### ✅ Phase 2.1 Manual Testing Checklist
+
+| # | Test | Steps | Expected Result |
+|---|------|-------|----------------|
+| 1 | Swagger loads | Visit `http://localhost:8080/swagger-ui.html` | API docs page |
+| 2 | Endpoints listed | Check page content | All controllers visible |
+| 3 | Login works | Try POST /auth/login | Token returned |
+| 4 | Authorization | Click Authorize, paste Bearer token | 🔒 icon shown |
+| 5 | Protected APIs | Try GET /products | Returns data |
+
+**📝 Documentation Update:**
+- [ ] Update [Testing Guide](./testing-guide.md) with Swagger instructions
 
 **Sign-off**: [ ] All tests passing — Ready for Phase 3
 
