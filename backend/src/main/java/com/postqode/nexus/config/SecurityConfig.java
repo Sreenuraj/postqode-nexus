@@ -30,10 +30,11 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/v1/auth/**", 
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/logout",
                                 "/health",
                                 "/actuator/health",
-                                "/readiness", 
+                                "/readiness",
                                 "/version",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -41,13 +42,11 @@ public class SecurityConfig {
                                 "/graphql",
                                 "/graphiql",
                                 "/vendor/**",
-                                "/webjars/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
+                                "/webjars/**")
+                        .permitAll()
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

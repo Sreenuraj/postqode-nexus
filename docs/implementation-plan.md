@@ -329,15 +329,17 @@ postqode-nexus/
 
 #### ✅ Phase 2.1 Manual Testing Checklist
 
-| # | Test | Steps | Expected Result |
-|---|------|-------|----------------|
-| 1 | Dev startup | Run `./scripts/start-dev.sh` | All services start |
-| 2 | Backend accessible | Visit `http://localhost:8080/health` | Returns UP |
-| 3 | Swagger loads | Visit `http://localhost:8080/swagger-ui.html` | API docs page |
-| 4 | Endpoints listed | Check page content | All controllers visible |
-| 5 | Login works | Try POST /auth/login | Token returned |
-| 6 | Authorization | Click Authorize, paste Bearer token | 🔒 icon shown |
-| 7 | Protected APIs | Try GET /products | Returns data |
+| # | Test | Steps | Expected Result | Status |
+|---|------|-------|----------------|--------|
+| 1 | Dev startup | Run `./scripts/start-dev.sh` | All services start | ✅ |
+| 2 | Backend accessible | Visit `http://localhost:8080/health` | Returns UP | ✅ |
+| 3 | Swagger loads | Visit `http://localhost:8080/swagger-ui.html` | API docs page | ✅ |
+| 4 | Endpoints listed | Check page content | All controllers visible | ✅ |
+| 5 | Login works | Try POST /auth/login | Token returned | ✅ |
+| 6 | Authorization | Click Authorize, paste Bearer token | 🔒 icon shown | ✅ |
+| 7 | Protected APIs | Try GET /products | Returns data | ✅ |
+
+**Sign-off**: [x] All tests passing — Ready for Phase 3
 | 8 | Stop dev | Run `./scripts/stop-dev.sh` | Services stopped |
 
 **📝 Documentation Updates:**
