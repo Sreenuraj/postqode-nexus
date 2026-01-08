@@ -43,6 +43,9 @@ public class AuthControllerIT {
     @MockBean
     private JwtTokenProvider jwtTokenProvider;
 
+    @MockBean
+    private UserRepository userRepository;
+
     @Test
     public void shouldLoginSuccessfully() throws Exception {
         LoginRequest loginRequest = new LoginRequest("admin", "password");
