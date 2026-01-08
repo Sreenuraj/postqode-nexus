@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(AuthController.class)
 @Import(com.postqode.nexus.config.SecurityConfig.class)
+@SuppressWarnings("null")
 public class AuthControllerIT {
 
     @Autowired
