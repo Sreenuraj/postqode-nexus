@@ -66,7 +66,7 @@ start_backend() {
         echo "   ⏳ Waiting for backend to start..."
         sleep 15
         
-        if curl -s http://localhost:8080/health > /dev/null 2>&1; then
+        if curl -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
             echo -e "${GREEN}   ✅ Backend ready on port 8080${NC}"
         else
             echo -e "${YELLOW}   ⏳ Still starting... check /tmp/nexus-backend.log${NC}"

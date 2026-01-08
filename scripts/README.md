@@ -31,6 +31,41 @@ Quick reference for all available scripts.
 
 ---
 
+## Testing Commands
+
+### Frontend Tests
+
+```bash
+# Run all frontend tests
+cd frontend && npm test
+
+# Run tests in watch mode
+cd frontend && npm test -- --watch
+
+# Run tests with coverage
+cd frontend && npm test:coverage
+
+# Run specific test file
+cd frontend && npm test -- ProductFormDialog.test.tsx
+```
+
+### Backend Tests
+
+```bash
+# Run all backend tests
+cd backend && mvn test
+
+# Run specific test class
+cd backend && mvn test -Dtest=ProductServiceTest
+
+# Run tests with coverage
+cd backend && mvn test jacoco:report
+```
+
+**Test Summary:** See `frontend/TEST_SUMMARY.md` for detailed test coverage report.
+
+---
+
 ## Detailed Descriptions
 
 ### `setup.sh` - Initial Setup

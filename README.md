@@ -50,12 +50,12 @@ postqode-nexus/
 │   ├── requirement document.md
 │   ├── implementation-plan.md
 │   └── application-functionality.md
-├── backend/                 # Java Spring Boot (coming soon)
-├── frontend/                # React Web App (coming soon)
-├── mobile/                  # React Native App (coming soon)
-├── database/                # Migrations & Seeds (coming soon)
-├── docker/                  # Docker Compose files (coming soon)
-└── automation/              # Test automation (coming soon)
+├── backend/                 # Java Spring Boot
+├── frontend/                # React Web App
+├── mobile/                  # React Native App (Coming in Phase 4)
+├── database/                # Migrations & Seeds
+├── docker/                  # Docker Compose files
+└── automation/              # Test automation (Coming in Phase 6)
 ```
 
 ## 📚 Documentation
@@ -67,7 +67,10 @@ postqode-nexus/
 ## 🚀 Quick Start
 
 ```bash
-# Coming soon
+# Start Development Environment (Backend + Frontend + DB)
+./scripts/start-dev.sh
+
+# Or using Docker Compose
 docker-compose up -d
 ```
 

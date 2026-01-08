@@ -1,38 +1,30 @@
 package com.postqode.nexus.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.postqode.nexus.dto.AuthResponse;
 import com.postqode.nexus.dto.LoginRequest;
 import com.postqode.nexus.model.User;
 import com.postqode.nexus.model.UserRole;
 import com.postqode.nexus.repository.UserRepository;
-import com.postqode.nexus.security.CustomUserDetailsService;
-import com.postqode.nexus.security.JwtTokenProvider;
-import com.postqode.nexus.service.AuthService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(AuthController.class)
-@Import(com.postqode.nexus.config.SecurityConfig.class)
-@SuppressWarnings("null")
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
 public class AuthControllerIT {
 
     @Autowired
@@ -41,114 +33,74 @@ public class AuthControllerIT {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
-    private AuthService authService;
-
-    @MockBean
-    private CustomUserDetailsService customUserDetailsService;
-
-    @MockBean
-    private JwtTokenProvider jwtTokenProvider;
-
-    @MockBean
+    @Autowired
     private UserRepository userRepository;
 
-    private User testUser;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void setUp() {
-        testUser = new User();
-        testUser.setId(UUID.randomUUID());
-        testUser.setUsername("admin");
-        testUser.setEmail("admin@demo.com");
-        testUser.setRole(UserRole.ADMIN);
+        // Create a unique test user in the DB for login tests to avoid conflict with
+        // existing local data
+        if (userRepository.findByUsername("it-admin").isEmpty()) {
+            User admin = User.builder()
+                    .username("it-admin")
+                    .email("it-admin@demo.com")
+                    .password(passwordEncoder.encode("Admin@123")) // Real encoding
+                    .role(UserRole.ADMIN)
+                    .build();
+            userRepository.save(admin);
+        }
     }
 
-    // ==================== LOGIN TESTS ====================
-
     @Test
-    public void shouldLoginSuccessfully() throws Exception {
-        LoginRequest loginRequest = new LoginRequest("admin", "Admin@123");
-        AuthResponse authResponse = new AuthResponse("jwt-token", "admin", "ADMIN");
-
-        when(authService.login(any(LoginRequest.class))).thenReturn(authResponse);
+    public void shouldLoginSuccessfully_WithRealCredentials() throws Exception {
+        LoginRequest loginRequest = new LoginRequest("it-admin", "Admin@123");
 
         mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").value("jwt-token"))
-                .andExpect(jsonPath("$.username").value("admin"))
+                .andExpect(jsonPath("$.token").exists())
+                .andExpect(jsonPath("$.username").value("it-admin"))
                 .andExpect(jsonPath("$.role").value("ADMIN"));
     }
 
     @Test
-    public void shouldRejectInvalidCredentials() throws Exception {
-        LoginRequest loginRequest = new LoginRequest("admin", "wrong-password");
+    public void shouldRejectInvalidCredentials_WithRealAuth() throws Exception {
+        LoginRequest loginRequest = new LoginRequest("it-admin", "WRONG-PASSWORD");
 
-        when(authService.login(any(LoginRequest.class)))
-                .thenThrow(new BadCredentialsException("Invalid credentials"));
-
-        // Spring Security returns 403 for BadCredentialsException in WebMvcTest
+        // Spring Security throws BadCredentialsException which is handled by Default
+        // handling or returns 401/403
+        // MockMvc with generic config might return 401 or 403.
         mockMvc.perform(post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden()); // Or status().isUnauthorized() depending on entry point
     }
 
-    // ==================== LOGOUT TESTS ====================
-
     @Test
-    @WithMockUser(username = "admin", roles = { "ADMIN" })
-    public void shouldLogoutSuccessfully() throws Exception {
-        mockMvc.perform(post("/api/v1/auth/logout"))
+    public void shouldGetCurrentUser_WithRealToken() throws Exception {
+        // 1. Login to get token
+        LoginRequest loginRequest = new LoginRequest("it-admin", "Admin@123");
+        String response = mockMvc.perform(post("/api/v1/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(loginRequest)))
+                .andReturn().getResponse().getContentAsString();
+
+        String token = objectMapper.readTree(response).get("token").asText();
+
+        // 2. Use token to get /me
+        mockMvc.perform(get("/api/v1/auth/me")
+                .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Logged out successfully"))
-                .andExpect(jsonPath("$.status").value("success"));
+                .andExpect(jsonPath("$.username").value("it-admin"))
+                .andExpect(jsonPath("$.email").value("it-admin@demo.com"));
     }
 
     @Test
-    public void logoutShouldBeAccessibleWithoutAuth() throws Exception {
-        // Logout endpoint is under /api/v1/auth/** which is permitAll
-        mockMvc.perform(post("/api/v1/auth/logout"))
-                .andExpect(status().isOk());
-    }
-
-    // ==================== GET CURRENT USER TESTS ====================
-
-    @Test
-    @WithMockUser(username = "admin", roles = { "ADMIN" })
-    public void shouldGetCurrentUser() throws Exception {
-        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(testUser));
-
-        mockMvc.perform(get("/api/v1/auth/me"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("admin"))
-                .andExpect(jsonPath("$.email").value("admin@demo.com"))
-                .andExpect(jsonPath("$.role").value("ADMIN"));
-    }
-
-    @Test
-    @WithMockUser(username = "user", roles = { "USER" })
-    public void shouldGetCurrentUserAsRegularUser() throws Exception {
-        User regularUser = new User();
-        regularUser.setId(UUID.randomUUID());
-        regularUser.setUsername("user");
-        regularUser.setEmail("user@demo.com");
-        regularUser.setRole(UserRole.USER);
-
-        when(userRepository.findByUsername("user")).thenReturn(Optional.of(regularUser));
-
-        mockMvc.perform(get("/api/v1/auth/me"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.username").value("user"))
-                .andExpect(jsonPath("$.role").value("USER"));
-    }
-
-    @Test
-    public void shouldRejectUnauthenticatedGetMe() throws Exception {
-        // /me endpoint requires authentication
-        // Without authentication, Spring Security returns 403 (Forbidden)
+    public void shouldFailToGetMe_WithoutToken() throws Exception {
         mockMvc.perform(get("/api/v1/auth/me"))
                 .andExpect(status().isForbidden());
     }

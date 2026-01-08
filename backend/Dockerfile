@@ -7,10 +7,10 @@ COPY src ./src
 RUN mvn package -DskipTests
 
 # Runtime stage
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s \
-  CMD wget -q --spider http://localhost:8080/health || exit 1
+  CMD wget -q --spider http://localhost:8080/actuator/health || exit 1
 ENTRYPOINT ["java", "-jar", "app.jar"]

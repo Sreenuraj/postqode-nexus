@@ -6,12 +6,14 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
@@ -24,7 +26,17 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication authentication) {
         UserDetails userPrincipal = (UserDetails) authentication.getPrincipal();
-        return generateToken(userPrincipal.getUsername());
+        String roles = userPrincipal.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+        
+        return Jwts.builder()
+                .subject(userPrincipal.getUsername())
+                .claim("roles", roles)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(getSignInKey())
+                .compact();
     }
 
     public String generateToken(String username) {
@@ -34,6 +46,11 @@ public class JwtTokenProvider {
                 .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSignInKey())
                 .compact();
+    }
+    
+    public String getRolesFromToken(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get("roles", String.class);
     }
 
     public String getUsernameFromToken(String token) {
@@ -63,18 +80,18 @@ public class JwtTokenProvider {
     }
 
     private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        // If the secret is plain text and not base64 encoded in properties, this might fail if not properly encoded.
-        // For simplicity in this demo, we assume it's a strong string that we can use directly or base64 encode.
-        // If the provided secret is just a string, we might need to encode it first or use Keys.hmacShaKeyFor(jwtSecret.getBytes())
-        // Given the default value is long text, let's try to use it as bytes directly if decode fails or just use bytes.
-        // Actually, standard practice with jjwt 0.12+ is to use a proper key.
-        // Let's assume the secret in properties is a Base64 encoded string of a key.
-        // If not, we should probably just use the bytes of the string.
+        // Try to decode as Base64 first, if it fails, use the secret as plain text
         try {
-             return Keys.hmacShaKeyFor(keyBytes);
-        } catch (IllegalArgumentException e) {
-             return Keys.hmacShaKeyFor(jwtSecret.getBytes());
+            byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (Exception e) {
+            // If Base64 decoding fails, use the secret string directly as bytes
+            // Ensure the key is at least 256 bits (32 bytes) for HS256
+            byte[] keyBytes = jwtSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            if (keyBytes.length < 32) {
+                throw new IllegalArgumentException("JWT secret must be at least 256 bits (32 bytes) long");
+            }
+            return Keys.hmacShaKeyFor(keyBytes);
         }
     }
 }

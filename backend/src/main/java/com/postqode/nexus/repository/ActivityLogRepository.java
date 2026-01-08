@@ -13,20 +13,24 @@ import java.util.UUID;
 
 @Repository
 public interface ActivityLogRepository extends JpaRepository<ActivityLog, UUID> {
-    
+
     List<ActivityLog> findByUserIdOrderByCreatedAtDesc(UUID userId);
-    
+
     List<ActivityLog> findByProductIdOrderByCreatedAtDesc(UUID productId);
-    
+
     @Query("SELECT a FROM ActivityLog a ORDER BY a.createdAt DESC")
     List<ActivityLog> findRecentActivity(Pageable pageable);
-    
+
     @Query("SELECT COUNT(a) FROM ActivityLog a WHERE a.createdAt >= CURRENT_DATE")
     long countActionsToday();
-    
+
     @Query("SELECT a.user.id as userId, COUNT(a) as count, MAX(a.createdAt) as lastAction " +
-           "FROM ActivityLog a " +
-           "WHERE a.createdAt >= :since " +
-           "GROUP BY a.user.id")
+            "FROM ActivityLog a " +
+            "WHERE a.createdAt >= :since " +
+            "GROUP BY a.user.id")
     List<Object[]> getUserActivityStats(@Param("since") LocalDateTime since);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @Query("UPDATE ActivityLog a SET a.product = null WHERE a.product.id = :productId")
+    void unlinkProduct(@Param("productId") UUID productId);
 }

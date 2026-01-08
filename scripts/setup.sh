@@ -35,7 +35,12 @@ fi
 echo ""
 echo "📦 Installing backend dependencies..."
 cd backend
-./mvnw dependency:go-offline -q || mvn dependency:go-offline -q
+if [ -f "./mvnw" ]; then
+    ./mvnw dependency:go-offline -q
+else
+    echo -e "${YELLOW}⚠️  Maven wrapper not found, using system Maven${NC}"
+    mvn dependency:go-offline -q
+fi
 echo -e "${GREEN}✅ Backend dependencies installed${NC}"
 cd ..
 
@@ -71,16 +76,18 @@ sleep 10
 echo ""
 echo "🔄 Running database migrations..."
 cd backend
-./mvnw flyway:migrate -q || mvn flyway:migrate -q
+if [ -f "./mvnw" ]; then
+    ./mvnw flyway:migrate -q
+else
+    mvn flyway:migrate -q
+fi
 echo -e "${GREEN}✅ Database migrations complete${NC}"
 cd ..
 
-# Load seed data
+# Seed data is loaded automatically via Flyway V2 migration
 echo ""
-echo "🌱 Loading seed data..."
-docker exec nexus-db psql -U nexus -d nexus -f /docker-entrypoint-initdb.d/V999__demo_data.sql 2>/dev/null || \
-    docker exec -i nexus-db psql -U nexus -d nexus < database/seeds/V999__demo_data.sql
-echo -e "${GREEN}✅ Seed data loaded${NC}"
+echo "🌱 Demo data loaded via Flyway migrations"
+echo -e "${GREEN}✅ Setup complete - demo users and products ready${NC}"
 
 echo ""
 echo "=========================================="

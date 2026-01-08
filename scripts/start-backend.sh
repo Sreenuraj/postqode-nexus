@@ -51,7 +51,12 @@ if [ -f "$PROJECT_ROOT/.env" ]; then
 fi
 
 # Start the backend
-./mvnw spring-boot:run
+if [ -f "./mvnw" ]; then
+    ./mvnw spring-boot:run
+else
+    echo -e "${YELLOW}⚠️  Maven wrapper not found, using system Maven${NC}"
+    mvn spring-boot:run
+fi
 
 # Note: This script will block while backend is running
 # Press Ctrl+C to stop

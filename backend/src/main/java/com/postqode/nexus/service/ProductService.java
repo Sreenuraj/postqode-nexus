@@ -72,7 +72,7 @@ public class ProductService {
                 .build();
 
         product = productRepository.save(product);
-        logActivity(currentUser, product, ActionType.CREATE, null, product);
+        logActivity(currentUser, product, ActionType.CREATE, null, mapToResponse(product));
 
         return mapToResponse(product);
     }
@@ -88,7 +88,7 @@ public class ProductService {
         }
 
         User currentUser = getCurrentUser();
-        Product oldProduct = copyProduct(product);
+        ProductResponse oldProduct = mapToResponse(product);
 
         product.setSku(request.getSku());
         product.setName(request.getName());
@@ -108,7 +108,7 @@ public class ProductService {
         product.setUpdatedBy(currentUser);
 
         product = productRepository.save(product);
-        logActivity(currentUser, product, ActionType.UPDATE, oldProduct, product);
+        logActivity(currentUser, product, ActionType.UPDATE, oldProduct, mapToResponse(product));
 
         return mapToResponse(product);
     }
@@ -119,8 +119,14 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         User currentUser = getCurrentUser();
+        ProductResponse oldProduct = mapToResponse(product);
+
+        // Unlink existing activity logs to prevent FK violation
+        activityLogRepository.unlinkProduct(id);
+
         productRepository.delete(product);
-        logActivity(currentUser, product, ActionType.DELETE, product, null);
+        // Pass null for product to avoid FK constraint violation since it's deleted
+        logActivity(currentUser, null, ActionType.DELETE, oldProduct, null);
     }
 
     @Transactional
@@ -129,13 +135,13 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         User currentUser = getCurrentUser();
-        Product oldProduct = copyProduct(product);
+        ProductResponse oldProduct = mapToResponse(product);
 
         product.setStatus(newStatus);
         product.setUpdatedBy(currentUser);
 
         product = productRepository.save(product);
-        logActivity(currentUser, product, ActionType.STATE_CHANGE, oldProduct, product);
+        logActivity(currentUser, product, ActionType.STATE_CHANGE, oldProduct, mapToResponse(product));
 
         return mapToResponse(product);
     }
@@ -177,7 +183,7 @@ public class ProductService {
 
         ActivityLog log = ActivityLog.builder()
                 .user(user)
-                .product(product)
+                .product(product) // This can be null for DELETE
                 .actionType(actionType)
                 .oldValue(oldMap)
                 .newValue(newMap)
@@ -202,15 +208,5 @@ public class ProductService {
                 .build();
     }
 
-    private Product copyProduct(Product product) {
-        return Product.builder()
-                .id(product.getId())
-                .sku(product.getSku())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .quantity(product.getQuantity())
-                .status(product.getStatus())
-                .build();
-    }
+    // Removed unused copyProduct method
 }
