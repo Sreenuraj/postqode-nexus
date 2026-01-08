@@ -16,6 +16,88 @@ This document outlines the complete implementation plan for **PostQode Nexus**, 
 
 ---
 
+## 1.1 Testing Philosophy
+
+> **Quality at Every Phase**: Testing is not a final phase — it's integrated into every development stage.
+
+### Testing Pyramid
+
+```
+                    ┌─────────────────┐
+                    │   E2E / Manual  │  ← Demo Flows
+                    │    (Slowest)    │
+                   ─┴─────────────────┴─
+                  ┌─────────────────────┐
+                  │  Integration Tests  │  ← API + DB
+                  │    (Medium Speed)   │
+                 ─┴─────────────────────┴─
+                ┌─────────────────────────┐
+                │      Unit Tests         │  ← Business Logic
+                │      (Fastest)          │
+                └─────────────────────────┘
+```
+
+### Testing Types by Layer
+
+| Test Type | Where | Tools | When Run |
+|-----------|-------|-------|----------|
+| **Unit Tests** | Backend services, Frontend components | JUnit, Vitest | Every commit |
+| **Integration Tests** | API endpoints, DB operations | REST Assured, Testcontainers | Every PR |
+| **Contract Tests** | API contracts (REST/GraphQL) | Pact, Apollo | Every PR |
+| **UI Component Tests** | React components | Testing Library | Every commit |
+| **E2E Tests** | User flows | Playwright | Pre-deploy |
+| **Manual Testing** | User experience, visual | Human | Each phase |
+
+### Manual Testing Strategy
+
+Each development phase includes **Manual Testing Checkpoints** with:
+- ✅ **Acceptance Criteria** — What must work
+- 🧪 **Test Steps** — Exact steps to verify
+- 📋 **Sign-off Checklist** — Before moving to next phase
+
+---
+
+## 1.2 Design System: shadcn/ui
+
+> **Why shadcn/ui?**: Accessible, customizable, automation-friendly components with stable IDs.
+
+### Selected Components
+
+| Component | Usage | Screen |
+|-----------|-------|--------|
+| `button` | All actions (Submit, Add, Edit, Delete) | All |
+| `input` | Text inputs (username, password, search) | Login, Catalog, Inventory |
+| `form` + `field` | Form validation and structure | Login, Product Form |
+| `table` | Product listing | Catalog |
+| `card` | Dashboard metrics | Dashboard |
+| `chart` | Analytics visualizations | Dashboard |
+| `dialog` | Add/Edit product modals | Inventory |
+| `alert-dialog` | Delete confirmation | Inventory |
+| `dropdown-menu` | Actions menu, User menu | Catalog, Header |
+| `select` | Status filter, Status change | Catalog, Inventory |
+| `pagination` | Product list pagination | Catalog |
+| `badge` | Status indicators | Catalog |
+| `sidebar` | Main navigation | All |
+| `sonner` | Toast notifications | All |
+| `skeleton` | Loading states | All |
+| `avatar` | User profile | Header |
+| `separator` | Visual dividers | All |
+
+### Installation Command
+
+```bash
+npx shadcn@latest init
+npx shadcn@latest add button input form table card chart dialog alert-dialog dropdown-menu select pagination badge sidebar sonner skeleton avatar separator
+```
+
+### Automation-Friendly Benefits
+
+- **Stable IDs**: Components support `id` and `data-testid` attributes
+- **Consistent Structure**: Predictable DOM hierarchy
+- **Accessible**: Built-in ARIA labels and keyboard navigation
+
+---
+
 ## 2. Project Structure
 
 ```
@@ -121,6 +203,28 @@ postqode-nexus/
 - [Data Models](./application-functionality.md#6-data-models) – Entity definitions for database schema
 - [Business Rules](./application-functionality.md#7-business-rules) – Constraints and validation logic
 
+#### 🧪 Phase 1 Testing
+
+| Test Type | Test | Command/Steps |
+|-----------|------|---------------|
+| Unit | Spring Boot context loads | `cd backend && mvn test` |
+| Unit | Flyway migrations run | `mvn flyway:migrate` |
+| Unit | Frontend builds | `cd frontend && npm run build` |
+| Integration | Docker Compose starts | `docker-compose up -d && docker-compose ps` |
+| Integration | Database connection | `docker exec nexus-db psql -U nexus -c 'SELECT 1'` |
+
+#### ✅ Phase 1 Manual Testing Checklist
+
+| # | Test | Steps | Expected Result |
+|---|------|-------|----------------|
+| 1 | Repo structure | Run `ls -la` in project root | All folders exist (backend, frontend, mobile, docs) |
+| 2 | Backend starts | Run `cd backend && mvn spring-boot:run` | Server starts on port 8080 |
+| 3 | Frontend starts | Run `cd frontend && npm run dev` | Vite server starts on port 5173 |
+| 4 | DB accessible | Connect with pgAdmin or `psql` | Tables created via migration |
+| 5 | Docker works | Run `docker-compose up -d` | All 3 containers healthy |
+
+**Sign-off**: [ ] All tests passing — Ready for Phase 2
+
 ---
 
 ### Phase 2: Core Backend (Week 3-4)
@@ -138,6 +242,33 @@ postqode-nexus/
 - **Authentication**: See [Login Screen - Validation Rules](./application-functionality.md#41-login-screen) for field validation and error messages
 - **Product Status Logic**: See [Status Indicators](./application-functionality.md#status-indicators) for auto-status rules
 - **Activity Logging**: See [Audit Rules](./application-functionality.md#73-audit-rules) for what to log
+
+#### 🧪 Phase 2 Testing
+
+| Test Type | Test | Command/Steps |
+|-----------|------|---------------|
+| Unit | AuthService tests | `cd backend && mvn test -Dtest=AuthServiceTest` |
+| Unit | ProductService tests | `cd backend && mvn test -Dtest=ProductServiceTest` |
+| Unit | User role validation | `mvn test -Dtest=RoleValidationTest` |
+| Integration | Auth API endpoints | `mvn test -Dtest=AuthControllerIT` |
+| Integration | Product CRUD API | `mvn test -Dtest=ProductControllerIT` |
+| Contract | REST API contracts | `mvn test -Dtest=ApiContractTest` |
+| Contract | GraphQL schema | `mvn test -Dtest=GraphQLSchemaTest` |
+
+#### ✅ Phase 2 Manual Testing Checklist
+
+| # | Test | Steps | Expected Result |
+|---|------|-------|----------------|
+| 1 | Login API | POST `/api/v1/auth/login` with valid creds | Returns JWT token |
+| 2 | Login fail | POST `/api/v1/auth/login` with invalid creds | Returns 401 error |
+| 3 | Get products | GET `/api/v1/products` with token | Returns product list |
+| 4 | Create product | POST `/api/v1/products` as Admin | Product created, 201 |
+| 5 | Create product (User) | POST `/api/v1/products` as User | 403 Forbidden |
+| 6 | Update status | PATCH `/api/v1/products/{id}/status` | Status changed, logged |
+| 7 | GraphQL query | POST `/graphql` with products query | Returns data |
+| 8 | Dashboard metrics | Query `dashboardMetrics` | Returns counts |
+
+**Sign-off**: [ ] All tests passing — Ready for Phase 3
 
 ---
 
@@ -182,6 +313,50 @@ postqode-nexus/
 - **Activity by User**: [Activity by User](./application-functionality.md#444-activity-by-user)
 - **Recent Activity Feed**: [Recent Activity Feed](./application-functionality.md#445-recent-activity-feed)
 
+#### 🎨 shadcn/ui Components for Phase 3
+
+| Screen | Components |
+|--------|------------|
+| Login | `form`, `input`, `button`, `card` |
+| Catalog | `table`, `input`, `select`, `badge`, `pagination`, `dropdown-menu` |
+| Inventory | `dialog`, `alert-dialog`, `form`, `input`, `select`, `button` |
+| Dashboard | `card`, `chart`, `badge`, `skeleton` |
+| Navigation | `sidebar`, `avatar`, `dropdown-menu`, `separator` |
+| Global | `sonner` (toasts), `skeleton` (loading) |
+
+#### 🧪 Phase 3 Testing
+
+| Test Type | Test | Command/Steps |
+|-----------|------|---------------|
+| Unit | Component tests | `cd frontend && npm run test` |
+| Unit | LoginForm validation | `npm run test -- LoginForm` |
+| Unit | ProductTable rendering | `npm run test -- ProductTable` |
+| E2E | Login flow | `npx playwright test login.spec.ts` |
+| E2E | Product CRUD | `npx playwright test products.spec.ts` |
+| Visual | UI screenshots | `npx playwright test --update-snapshots` |
+
+#### ✅ Phase 3 Manual Testing Checklist
+
+| # | Test | Steps | Expected Result |
+|---|------|-------|----------------|
+| 1 | Login success | Enter admin/Admin@123, click Login | Redirects to catalog |
+| 2 | Login failure | Enter wrong password | Shows error message |
+| 3 | View catalog | After login, view product list | Table shows products |
+| 4 | Search | Type in search box | Table filters in real-time |
+| 5 | Filter status | Select "Low Stock" filter | Only low stock shown |
+| 6 | Sort | Click column header | Table sorts |
+| 7 | Pagination | Click page 2 | Shows next 10 products |
+| 8 | Add product | Click Add, fill form, Save | Product appears in list |
+| 9 | Edit product | Click Edit, change name, Save | Name updated |
+| 10 | Delete product | Click Delete, Confirm | Product removed |
+| 11 | Change status | Change status dropdown | Status badge updates |
+| 12 | Dashboard metrics | Navigate to Dashboard | Cards show correct counts |
+| 13 | Dashboard charts | View pie/bar charts | Charts render correctly |
+| 14 | Logout | Click Logout | Returns to login page |
+| 15 | Role restriction | Login as User, try to add product | Add button not visible |
+
+**Sign-off**: [ ] All tests passing — Ready for Phase 4
+
 ---
 
 ### Phase 4: Mobile Development (Week 7-8)
@@ -199,6 +374,33 @@ postqode-nexus/
 - **Breakpoints**: [Breakpoints](./application-functionality.md#101-breakpoints)
 - **Component Adaptations**: [Component Adaptations](./application-functionality.md#102-component-adaptations)
 
+#### 🧪 Phase 4 Testing
+
+| Test Type | Test | Command/Steps |
+|-----------|------|---------------|
+| Unit | Component tests | `cd mobile && npm run test` |
+| Unit | Navigation tests | `npm run test -- Navigation` |
+| Integration | API integration | `npm run test:integration` |
+| E2E (Android) | Full flow | `npx detox test -c android.emu.debug` |
+| E2E (iOS) | Full flow | `npx detox test -c ios.sim.debug` |
+
+#### ✅ Phase 4 Manual Testing Checklist
+
+| # | Test | Device | Steps | Expected Result |
+|---|------|--------|-------|----------------|
+| 1 | Login | Android | Enter creds, tap Login | Goes to catalog |
+| 2 | Login | iOS | Enter creds, tap Login | Goes to catalog |
+| 3 | Catalog scroll | Both | Scroll product list | Smooth scrolling |
+| 4 | Search | Both | Type in search | Filters products |
+| 5 | Add product | Android | Tap +, fill form, Save | Product added |
+| 6 | Add product | iOS | Tap +, fill form, Save | Product added |
+| 7 | Dashboard | Both | View charts | Charts render |
+| 8 | Navigation | Both | Switch between tabs | Correct screens |
+| 9 | Offline | Both | Turn off network | Graceful error |
+| 10 | Web parity | Both | Compare with web | Same functionality |
+
+**Sign-off**: [ ] All tests passing — Ready for Phase 5
+
 ---
 
 ### Phase 5: CI/CD & DevOps (Week 9)
@@ -213,6 +415,33 @@ postqode-nexus/
 
 **Functional Reference:**
 - [Logout - Session Timeout](./application-functionality.md#session-timeout) – Token expiry configuration
+
+#### 🧪 Phase 5 Testing
+
+| Test Type | Test | Command/Steps |
+|-----------|------|---------------|
+| Integration | CI builds pass | Push to branch, check GitHub Actions |
+| Integration | Docker images build | `docker-compose build` |
+| Integration | Multi-env deploy | Deploy to dev, then demo |
+| Health | Health endpoints | `curl http://localhost:8080/health` |
+| Health | Readiness probe | `curl http://localhost:8080/readiness` |
+| Smoke | Post-deploy smoke | `npm run test:smoke` |
+
+#### ✅ Phase 5 Manual Testing Checklist
+
+| # | Test | Steps | Expected Result |
+|---|------|-------|----------------|
+| 1 | CI triggers | Push commit to main | GitHub Action runs |
+| 2 | CI passes | Check Actions tab | All jobs green |
+| 3 | Docker build | Run `docker-compose build` | Images created |
+| 4 | Docker run | Run `docker-compose up -d` | Containers healthy |
+| 5 | Health check | Visit `/health` | Returns `{"status": "UP"}` |
+| 6 | Readiness | Visit `/readiness` | Returns 200 |
+| 7 | Version | Visit `/version` | Returns version info |
+| 8 | Demo deploy | Deploy to demo env | App accessible |
+| 9 | Rollback | Rollback to prev image | App still works |
+
+**Sign-off**: [ ] All tests passing — Ready for Phase 6
 
 ---
 
@@ -230,6 +459,31 @@ postqode-nexus/
 - **Admin Flow**: [Admin Demo Flow (5 minutes)](./application-functionality.md#121-admin-demo-flow-5-minutes)
 - **User Flow**: [User Demo Flow (3 minutes)](./application-functionality.md#122-user-demo-flow-3-minutes)
 
+#### 🧪 Phase 6 Testing (Meta-Testing)
+
+| Test Type | Test | Command/Steps |
+|-----------|------|---------------|
+| Coverage | Backend coverage | `mvn jacoco:report` (target 80%) |
+| Coverage | Frontend coverage | `npm run test:coverage` (target 70%) |
+| E2E Suite | Full regression | `npx playwright test` |
+| E2E Suite | Mobile regression | `npx detox test --configuration release` |
+| API Suite | Contract validation | `npm run test:contracts` |
+| Reset | Demo reset script | `./scripts/reset-demo.sh` |
+
+#### ✅ Phase 6 Manual Testing Checklist
+
+| # | Test | Steps | Expected Result |
+|---|------|-------|----------------|
+| 1 | Coverage report | Run coverage commands | Meets thresholds |
+| 2 | Admin demo flow | Follow [Admin Demo Flow](./application-functionality.md#121-admin-demo-flow-5-minutes) | Completes in 5 min |
+| 3 | User demo flow | Follow [User Demo Flow](./application-functionality.md#122-user-demo-flow-3-minutes) | Completes in 3 min |
+| 4 | Reset script | Run `./reset-demo.sh` | Data reset, app works |
+| 5 | Cross-browser | Test in Chrome, Firefox, Safari | All work |
+| 6 | Responsive | Test at mobile breakpoints | UI adapts correctly |
+| 7 | Accessibility | Run Lighthouse audit | Score > 90 |
+
+**Sign-off**: [ ] All tests passing — Ready for Phase 7
+
 ---
 
 ### Phase 7: Polish & Documentation (Week 11-12)
@@ -246,6 +500,33 @@ postqode-nexus/
 - **Error Handling**: [Error Handling](./application-functionality.md#8-error-handling)
 - **Accessibility**: [Accessibility](./application-functionality.md#11-accessibility)
 - **Toast Notifications**: [Toast Notifications](./application-functionality.md#91-toast-notifications)
+
+#### 🧪 Phase 7 Testing (Final Validation)
+
+| Test Type | Test | Command/Steps |
+|-----------|------|---------------|
+| E2E | Full E2E suite | `npx playwright test --project=all` |
+| Visual | Visual regression | `npx playwright test --update-snapshots` |
+| Performance | Lighthouse CI | `npx lhci autorun` |
+| Load | Basic load test | `npx artillery run load-test.yml` |
+| Security | OWASP scan | `npm run security:scan` |
+
+#### ✅ Phase 7 Manual Testing Checklist (Final Demo Readiness)
+
+| # | Test | Steps | Expected Result |
+|---|------|-------|----------------|
+| 1 | Full demo run | Run complete demo script | No issues |
+| 2 | Demo reset | Reset and run again | Consistent behavior |
+| 3 | Error states | Trigger each error state | Proper error messages |
+| 4 | Toast notifications | Trigger all toasts | Appear correctly |
+| 5 | Loading states | Slow network simulation | Skeletons show |
+| 6 | Keyboard navigation | Tab through all elements | All focusable |
+| 7 | Screen reader | Test with VoiceOver | Accessible |
+| 8 | Documentation | Review all docs | Accurate and complete |
+| 9 | Demo video | Record demo video | Smooth and clear |
+| 10 | Stakeholder demo | Demo to team | Approved
+
+**🎉 Final Sign-off**: [ ] All tests passing — Ready for Production Demo!
 
 ---
 
