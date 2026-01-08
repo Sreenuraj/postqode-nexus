@@ -1,0 +1,87 @@
+# PostQode Nexus
+
+> **From requirements to reality**
+
+PostQode Nexus is a CI/CD-ready demo application designed to showcase the full PostQode value chain — from BRD ingestion to automation readiness.
+
+## 🎯 Purpose
+
+This is a **long-living demo asset** for:
+- Customer demos
+- Sales presentations
+- Demo videos
+- PoCs
+- Automation showcases
+
+## 🏗️ Business Domain
+
+**Inventory & Product Management** — A universally understood domain that supports CRUD operations, workflows, roles, and analytics.
+
+## 👥 User Roles
+
+| Role | Capabilities |
+|------|-------------|
+| **Admin** | Full product & inventory control, dashboard access, analytics |
+| **User** | View-only catalog, search, sort, filter |
+
+## 🖥️ Screens
+
+1. **Login** — Role-based authentication
+2. **Product Catalog** — Search, sort, filter, pagination
+3. **Inventory Management** — Add, update, delete products (Admin)
+4. **Dashboard** — Real-time analytics (Admin)
+5. **Logout** — Session termination
+
+## 🛠️ Technology Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend (Web) | React + TypeScript + Vite |
+| Mobile | React Native |
+| Backend | Java + Spring Boot |
+| Database | PostgreSQL |
+| APIs | REST + GraphQL |
+
+## 📁 Project Structure
+
+```
+postqode-nexus/
+├── docs/                    # Documentation
+│   ├── requirement document.md
+│   ├── implementation-plan.md
+│   └── application-functionality.md
+├── backend/                 # Java Spring Boot (coming soon)
+├── frontend/                # React Web App (coming soon)
+├── mobile/                  # React Native App (coming soon)
+├── database/                # Migrations & Seeds (coming soon)
+├── docker/                  # Docker Compose files (coming soon)
+└── automation/              # Test automation (coming soon)
+```
+
+## 📚 Documentation
+
+- [Requirement Document](./docs/requirement%20document.md) — What to build
+- [Implementation Plan](./docs/implementation-plan.md) — How to build it
+- [Application Functionality](./docs/application-functionality.md) — What it does
+
+## 🚀 Quick Start
+
+```bash
+# Coming soon
+docker-compose up -d
+```
+
+## 🔑 Demo Credentials
+
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | admin | Admin@123 |
+| User | user | User@123 |
+
+## 📄 License
+
+Proprietary — PostQode Internal
+
+---
+
+*Built with ❤️ by the PostQode Team*
