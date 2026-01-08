@@ -1,9 +1,14 @@
 package com.postqode.nexus.service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postqode.nexus.dto.ProductRequest;
 import com.postqode.nexus.dto.ProductResponse;
-import com.postqode.nexus.model.*;
+import com.postqode.nexus.model.ActionType;
+import com.postqode.nexus.model.ActivityLog;
+import com.postqode.nexus.model.Product;
+import com.postqode.nexus.model.ProductStatus;
+import com.postqode.nexus.model.User;
 import com.postqode.nexus.repository.ActivityLogRepository;
 import com.postqode.nexus.repository.ProductRepository;
 import com.postqode.nexus.repository.UserRepository;
@@ -89,15 +94,16 @@ public class ProductService {
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
-        
-        // Auto-update status based on quantity if not explicitly provided or if logic dictates
+
+        // Auto-update status based on quantity if not explicitly provided or if logic
+        // dictates
         // If request has status, use it, otherwise recalculate based on quantity
         if (request.getStatus() != null) {
             product.setStatus(request.getStatus());
         } else {
             product.setStatus(calculateStatus(request.getQuantity(), product.getStatus()));
         }
-        
+
         product.setUpdatedBy(currentUser);
 
         product = productRepository.save(product);
@@ -110,7 +116,7 @@ public class ProductService {
     public void deleteProduct(UUID id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
-        
+
         User currentUser = getCurrentUser();
         productRepository.delete(product);
         logActivity(currentUser, product, ActionType.DELETE, product, null);
@@ -139,7 +145,8 @@ public class ProductService {
         } else if (quantity < 10) { // Threshold for low stock
             return ProductStatus.LOW_STOCK;
         } else {
-            // If currently OUT_OF_STOCK or LOW_STOCK and quantity is high enough, go back to ACTIVE
+            // If currently OUT_OF_STOCK or LOW_STOCK and quantity is high enough, go back
+            // to ACTIVE
             // Or if it's a new product (currentStatus is null or whatever)
             return ProductStatus.ACTIVE;
         }
@@ -158,8 +165,14 @@ public class ProductService {
     }
 
     private void logActivity(User user, Product product, ActionType actionType, Object oldValue, Object newValue) {
-        Map<String, Object> oldMap = oldValue != null ? objectMapper.convertValue(oldValue, Map.class) : null;
-        Map<String, Object> newMap = newValue != null ? objectMapper.convertValue(newValue, Map.class) : null;
+        Map<String, Object> oldMap = oldValue != null
+                ? objectMapper.convertValue(oldValue, new TypeReference<Map<String, Object>>() {
+                })
+                : null;
+        Map<String, Object> newMap = newValue != null
+                ? objectMapper.convertValue(newValue, new TypeReference<Map<String, Object>>() {
+                })
+                : null;
 
         ActivityLog log = ActivityLog.builder()
                 .user(user)
@@ -168,7 +181,7 @@ public class ProductService {
                 .oldValue(oldMap)
                 .newValue(newMap)
                 .build();
-        
+
         activityLogRepository.save(log);
     }
 
@@ -187,7 +200,7 @@ public class ProductService {
                 .updatedAt(product.getUpdatedAt())
                 .build();
     }
-    
+
     private Product copyProduct(Product product) {
         return Product.builder()
                 .id(product.getId())

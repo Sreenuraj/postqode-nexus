@@ -14,7 +14,6 @@ import org.springframework.stereotype.Controller;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * GraphQL Query Resolver
@@ -22,7 +21,8 @@ import java.util.stream.Collectors;
  * Access GraphQL endpoint at: http://localhost:8080/graphql
  * GraphiQL UI available at: http://localhost:8080/graphiql
  * 
- * Note: GraphQL endpoints are not shown in Swagger UI as they use a different protocol.
+ * Note: GraphQL endpoints are not shown in Swagger UI as they use a different
+ * protocol.
  * Use GraphiQL or a GraphQL client to test these endpoints.
  */
 @Controller
@@ -36,9 +36,9 @@ public class GraphQLController implements GraphQLQueryResolver {
     public ProductConnection products(String search, ProductStatus status, Integer page, Integer pageSize) {
         int p = page != null ? page : 0;
         int s = pageSize != null ? pageSize : 10;
-        
+
         Page<ProductResponse> productPage = productService.getProducts(status, search, PageRequest.of(p, s));
-        
+
         return ProductConnection.builder()
                 .items(productPage.getContent())
                 .totalCount((int) productPage.getTotalElements())

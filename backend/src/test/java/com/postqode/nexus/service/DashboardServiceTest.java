@@ -26,6 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unused")
 public class DashboardServiceTest {
 
     @Mock
@@ -67,14 +68,14 @@ public class DashboardServiceTest {
     public void shouldGetActivityByUser() {
         UUID userId = UUID.randomUUID();
         LocalDateTime lastAction = LocalDateTime.now();
-        Object[] row = {userId, 10L, lastAction};
-        
+        Object[] row = { userId, 10L, lastAction };
+
         when(activityLogRepository.getUserActivityStats(any())).thenReturn(Collections.singletonList(row));
-        
+
         User user = new User();
         user.setId(userId);
         user.setUsername("testuser");
-        
+
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
 
         List<UserActivity> activities = dashboardService.getActivityByUser(7);

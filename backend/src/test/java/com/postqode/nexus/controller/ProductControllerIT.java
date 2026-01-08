@@ -33,82 +33,84 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ProductController.class)
 @Import(com.postqode.nexus.config.SecurityConfig.class)
+@SuppressWarnings("null")
 public class ProductControllerIT {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @MockBean
-    private ProductService productService;
+        @MockBean
+        private ProductService productService;
 
-    @MockBean
-    private CustomUserDetailsService customUserDetailsService;
+        @MockBean
+        private CustomUserDetailsService customUserDetailsService;
 
-    @MockBean
-    private JwtTokenProvider jwtTokenProvider;
+        @MockBean
+        private JwtTokenProvider jwtTokenProvider;
 
-    @Test
-    @WithMockUser(roles = "ADMIN")
-    public void shouldCreateProduct() throws Exception {
-        ProductRequest request = ProductRequest.builder()
-                .sku("SKU-001")
-                .name("Test Product")
-                .price(BigDecimal.valueOf(100.0))
-                .quantity(10)
-                .build();
+        @Test
+        @WithMockUser(roles = "ADMIN")
+        public void shouldCreateProduct() throws Exception {
+                ProductRequest request = ProductRequest.builder()
+                                .sku("SKU-001")
+                                .name("Test Product")
+                                .price(BigDecimal.valueOf(100.0))
+                                .quantity(10)
+                                .build();
 
-        ProductResponse response = ProductResponse.builder()
-                .id(UUID.randomUUID())
-                .sku("SKU-001")
-                .name("Test Product")
-                .price(BigDecimal.valueOf(100.0))
-                .quantity(10)
-                .status(ProductStatus.ACTIVE)
-                .build();
+                ProductResponse response = ProductResponse.builder()
+                                .id(UUID.randomUUID())
+                                .sku("SKU-001")
+                                .name("Test Product")
+                                .price(BigDecimal.valueOf(100.0))
+                                .quantity(10)
+                                .status(ProductStatus.ACTIVE)
+                                .build();
 
-        when(productService.createProduct(any(ProductRequest.class))).thenReturn(response);
+                when(productService.createProduct(any(ProductRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/v1/products")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.sku").value("SKU-001"));
-    }
+                mockMvc.perform(post("/api/v1/products")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.sku").value("SKU-001"));
+        }
 
-    @Test
-    @WithMockUser(roles = "USER")
-    public void shouldForbidCreateProductForUser() throws Exception {
-        ProductRequest request = ProductRequest.builder()
-                .sku("SKU-001")
-                .name("Test Product")
-                .price(BigDecimal.valueOf(100.0))
-                .quantity(10)
-                .build();
+        @Test
+        @WithMockUser(roles = "USER")
+        public void shouldForbidCreateProductForUser() throws Exception {
+                ProductRequest request = ProductRequest.builder()
+                                .sku("SKU-001")
+                                .name("Test Product")
+                                .price(BigDecimal.valueOf(100.0))
+                                .quantity(10)
+                                .build();
 
-        mockMvc.perform(post("/api/v1/products")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isForbidden());
-    }
+                mockMvc.perform(post("/api/v1/products")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request)))
+                                .andExpect(status().isForbidden());
+        }
 
-    @Test
-    @WithMockUser
-    public void shouldGetProducts() throws Exception {
-        ProductResponse response = ProductResponse.builder()
-                .id(UUID.randomUUID())
-                .sku("SKU-001")
-                .name("Test Product")
-                .build();
-        
-        Page<ProductResponse> page = new PageImpl<>(Collections.singletonList(response), PageRequest.of(0, 10), 1);
+        @Test
+        @WithMockUser
+        public void shouldGetProducts() throws Exception {
+                ProductResponse response = ProductResponse.builder()
+                                .id(UUID.randomUUID())
+                                .sku("SKU-001")
+                                .name("Test Product")
+                                .build();
 
-        when(productService.getProducts(any(), any(), any(Pageable.class))).thenReturn(page);
+                Page<ProductResponse> page = new PageImpl<>(Collections.singletonList(response), PageRequest.of(0, 10),
+                                1);
 
-        mockMvc.perform(get("/api/v1/products"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].sku").value("SKU-001"));
-    }
+                when(productService.getProducts(any(), any(), any(Pageable.class))).thenReturn(page);
+
+                mockMvc.perform(get("/api/v1/products"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.content[0].sku").value("SKU-001"));
+        }
 }
