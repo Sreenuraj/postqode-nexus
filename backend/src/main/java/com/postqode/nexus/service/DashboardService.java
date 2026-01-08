@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class DashboardService {
 
     private final ProductRepository productRepository;
