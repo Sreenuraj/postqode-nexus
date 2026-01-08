@@ -3,7 +3,6 @@ package com.postqode.nexus.controller;
 import com.postqode.nexus.dto.ProductResponse;
 import com.postqode.nexus.dto.graphql.DashboardMetrics;
 import com.postqode.nexus.dto.graphql.ProductConnection;
-import com.postqode.nexus.model.ProductStatus;
 import com.postqode.nexus.service.DashboardService;
 import com.postqode.nexus.service.ProductService;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,7 +41,7 @@ public class GraphQLControllerTest {
                 .sku("SKU-001")
                 .name("Test Product")
                 .build();
-        
+
         Page<ProductResponse> page = new PageImpl<>(Collections.singletonList(response), PageRequest.of(0, 10), 1);
 
         when(productService.getProducts(any(), any(), any())).thenReturn(page);
