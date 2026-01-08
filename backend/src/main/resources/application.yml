@@ -45,6 +45,33 @@ jwt:
   secret: ${JWT_SECRET:demo-secret-key-change-in-production}
   expiration: ${JWT_EXPIRY:86400}
 
+app:
+  version: 1.0.0
+
+# Swagger/OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    filter: true
+    displayRequestDuration: true
+
+# GraphQL Configuration
+graphql:
+  servlet:
+    mapping: /graphql
+    enabled: true
+    corsEnabled: true
+  playground:
+    mapping: /graphiql
+    enabled: true
+
 logging:
   level:
     com.postqode.nexus: INFO

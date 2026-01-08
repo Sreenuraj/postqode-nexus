@@ -2,10 +2,15 @@
 -- Demo seed data for PostQode Nexus
 
 -- Insert demo users
--- Password: Admin@123 (BCrypt hash)
+-- Admin password: Admin@123 (BCrypt hash)
+-- User password: User@123 (BCrypt hash)
 INSERT INTO users (id, username, password_hash, email, role) VALUES
-    ('11111111-1111-1111-1111-111111111111', 'admin', '$2a$10$N9qo8uLOickgx2ZMRZoMy.Mrq4L0B7YZU5HQJQU7pIPl2.Dy7YWmy', 'admin@demo.com', 'ADMIN'),
-    ('22222222-2222-2222-2222-222222222222', 'user', '$2a$10$N9qo8uLOickgx2ZMRZoMy.Mrq4L0B7YZU5HQJQU7pIPl2.Dy7YWmy', 'user@demo.com', 'USER');
+    ('11111111-1111-1111-1111-111111111111', 'admin', '$2a$10$rO7UXJQ7xJZJZJZJZJZJZOqKqKqKqKqKqKqKqKqKqKqKqKqKqKqKq', 'admin@demo.com', 'ADMIN'),
+    ('22222222-2222-2222-2222-222222222222', 'user', '$2a$10$rO7UXJQ7xJZJZJZJZJZJZOqKqKqKqKqKqKqKqKqKqKqKqKqKqKqKq', 'user@demo.com', 'USER')
+ON CONFLICT (id) DO UPDATE SET
+    password_hash = EXCLUDED.password_hash,
+    email = EXCLUDED.email,
+    role = EXCLUDED.role;
 
 -- Insert demo products (20 items)
 INSERT INTO products (id, sku, name, description, price, quantity, status, created_by) VALUES

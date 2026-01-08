@@ -29,7 +29,20 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/**", "/health", "/readiness", "/version").permitAll()
+                        .requestMatchers(
+                                "/api/v1/auth/**", 
+                                "/health",
+                                "/actuator/health",
+                                "/readiness", 
+                                "/version",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/graphql",
+                                "/graphiql",
+                                "/vendor/**",
+                                "/webjars/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
