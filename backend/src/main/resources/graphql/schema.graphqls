@@ -1,0 +1,91 @@
+type Query {
+  # Products
+  products(
+    search: String
+    status: ProductStatus
+    page: Int
+    pageSize: Int
+  ): ProductConnection!
+  
+  product(id: ID!): Product
+  
+  # Dashboard Analytics
+  dashboardMetrics: DashboardMetrics!
+  productsAddedToday: Int!
+  productsByStatus: [StatusCount!]!
+  activityByUser(days: Int): [UserActivity!]!
+  recentActivity(limit: Int): [ActivityLog!]!
+}
+
+type Product {
+  id: ID!
+  sku: String!
+  name: String!
+  description: String
+  price: Float!
+  quantity: Int!
+  status: ProductStatus!
+  createdBy: String
+  updatedBy: String
+  createdAt: String!
+  updatedAt: String!
+}
+
+type ProductConnection {
+  items: [Product!]!
+  totalCount: Int!
+  pageInfo: PageInfo!
+}
+
+type PageInfo {
+  currentPage: Int!
+  pageSize: Int!
+  totalPages: Int!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+type DashboardMetrics {
+  totalProducts: Int!
+  activeProducts: Int!
+  lowStockProducts: Int!
+  outOfStockProducts: Int!
+  productsAddedToday: Int!
+  actionsToday: Int!
+}
+
+type StatusCount {
+  status: ProductStatus!
+  count: Int!
+}
+
+type UserActivity {
+  username: String!
+  actionCount: Int!
+  lastAction: String
+}
+
+type ActivityLog {
+  id: ID!
+  username: String!
+  productName: String
+  actionType: ActionType!
+  oldValue: String
+  newValue: String
+  createdAt: String!
+}
+
+enum ProductStatus {
+  ACTIVE
+  LOW_STOCK
+  OUT_OF_STOCK
+}
+
+enum ActionType {
+  CREATE
+  UPDATE
+  DELETE
+  STATE_CHANGE
+  LOGIN
+  LOGOUT
+}
