@@ -93,7 +93,39 @@ backend/
 | Endpoint | Description |
 |----------|-------------|
 | POST `/graphql` | GraphQL queries |
-| GET `/graphiql` | GraphQL playground |
+| GET `/graphiql` | GraphQL playground (interactive) |
+| GET `/graphql/schema.json` | GraphQL schema (JSON) |
+| File: `src/main/resources/graphql/schema.graphqls` | Schema definition |
+
+**Available Queries:**
+```graphql
+# Products
+products(search: String, status: ProductStatus, page: Int, pageSize: Int): ProductConnection!
+product(id: ID!): Product
+
+# Dashboard Analytics
+dashboardMetrics: DashboardMetrics!
+productsAddedToday: Int!
+productsByStatus: [StatusCount!]!
+activityByUser(days: Int): [UserActivity!]!
+recentActivity(limit: Int): [ActivityLog!]!
+```
+
+**Example Query:**
+```graphql
+query {
+  dashboardMetrics {
+    totalProducts
+    activeProducts
+    lowStockProducts
+    outOfStockProducts
+  }
+  products(status: ACTIVE, pageSize: 5) {
+    items { id, name, sku, price, quantity }
+    totalCount
+  }
+}
+```
 
 ### Health
 | Endpoint | Description |
