@@ -279,19 +279,30 @@ postqode-nexus/
 
 ---
 
-### Phase 2.1: API Documentation (Week 4)
+### Phase 2.1: API Documentation & Dev Tools (Week 4)
 
-> **📝 Documentation**: This phase enables interactive API testing via Swagger UI.
+> **📝 Documentation**: This phase enables interactive API testing via Swagger UI and provides scripts for starting services.
 
 | Task | Description | Deliverables |
 |------|-------------|--------------|
-| 2.1.1 | Add springdoc-openapi | Maven dependency |
+| 2.1.1 | Add springdoc-openapi | Maven dependency added ✅ |
 | 2.1.2 | Configure Swagger UI | OpenAPI 3.0 config |
 | 2.1.3 | Annotate controllers | @Operation, @ApiResponse |
 | 2.1.4 | Secure Swagger UI | JWT authentication |
-| 2.1.5 | Update docs | Update testing-guide.md |
+| 2.1.5 | Create startup scripts | start-dev.sh, start-all.sh, etc. ✅ |
+| 2.1.6 | Update security config | Allow /swagger-ui/** endpoints |
+| 2.1.7 | Update docs | Update development & testing guides |
 
-**Backend Dependency:**
+**Startup Scripts Created:**
+| Script | Purpose |
+|--------|---------|
+| `scripts/start-dev.sh` | Start DB + Backend + Frontend locally |
+| `scripts/stop-dev.sh` | Stop all local services |
+| `scripts/start-backend.sh` | Start backend only |
+| `scripts/start-frontend.sh` | Start frontend only |
+| `scripts/start-all.sh` | Start all via Docker Compose |
+
+**Backend Dependency (already added):**
 ```xml
 <dependency>
     <groupId>org.springdoc</groupId>
@@ -300,12 +311,16 @@ postqode-nexus/
 </dependency>
 ```
 
-**Access URL:** `http://localhost:8080/swagger-ui.html`
+**Access URLs:**
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 
 #### 🧪 Phase 2.1 Testing
 
 | Test Type | Test | Command/Steps |
 |-----------|------|---------------|
+| Script | start-dev.sh works | `./scripts/start-dev.sh` |
+| Script | start-all.sh works | `./scripts/start-all.sh` |
 | Manual | Swagger UI loads | Visit `/swagger-ui.html` |
 | Manual | Auth endpoint visible | Expand `/api/v1/auth` |
 | Manual | Try login | Execute login, get token |
@@ -316,13 +331,17 @@ postqode-nexus/
 
 | # | Test | Steps | Expected Result |
 |---|------|-------|----------------|
-| 1 | Swagger loads | Visit `http://localhost:8080/swagger-ui.html` | API docs page |
-| 2 | Endpoints listed | Check page content | All controllers visible |
-| 3 | Login works | Try POST /auth/login | Token returned |
-| 4 | Authorization | Click Authorize, paste Bearer token | 🔒 icon shown |
-| 5 | Protected APIs | Try GET /products | Returns data |
+| 1 | Dev startup | Run `./scripts/start-dev.sh` | All services start |
+| 2 | Backend accessible | Visit `http://localhost:8080/health` | Returns UP |
+| 3 | Swagger loads | Visit `http://localhost:8080/swagger-ui.html` | API docs page |
+| 4 | Endpoints listed | Check page content | All controllers visible |
+| 5 | Login works | Try POST /auth/login | Token returned |
+| 6 | Authorization | Click Authorize, paste Bearer token | 🔒 icon shown |
+| 7 | Protected APIs | Try GET /products | Returns data |
+| 8 | Stop dev | Run `./scripts/stop-dev.sh` | Services stopped |
 
-**📝 Documentation Update:**
+**📝 Documentation Updates:**
+- [ ] Update [Development Guide](./development-guide.md) with script usage
 - [ ] Update [Testing Guide](./testing-guide.md) with Swagger instructions
 
 **Sign-off**: [ ] All tests passing — Ready for Phase 3
