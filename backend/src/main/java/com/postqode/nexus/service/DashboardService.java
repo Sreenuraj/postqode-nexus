@@ -64,15 +64,15 @@ public class DashboardService {
     public List<UserActivity> getActivityByUser(int days) {
         LocalDateTime since = LocalDateTime.now().minusDays(days);
         List<Object[]> stats = activityLogRepository.getUserActivityStats(since);
-        
+
         return stats.stream().map(row -> {
             UUID userId = (UUID) row[0];
             Long count = (Long) row[1];
             LocalDateTime lastAction = (LocalDateTime) row[2];
-            
+
             User user = userRepository.findById(userId).orElse(null);
             String username = user != null ? user.getUsername() : "Unknown";
-            
+
             return UserActivity.builder()
                     .username(username)
                     .actionCount(count.intValue())
@@ -90,7 +90,7 @@ public class DashboardService {
     private ActivityLogResponse mapToResponse(ActivityLog log) {
         String oldValueStr = null;
         String newValueStr = null;
-        
+
         try {
             if (log.getOldValue() != null) {
                 oldValueStr = objectMapper.writeValueAsString(log.getOldValue());

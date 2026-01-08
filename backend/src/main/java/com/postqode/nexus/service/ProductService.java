@@ -25,6 +25,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class ProductService {
 
     private final ProductRepository productRepository;
@@ -140,7 +141,7 @@ public class ProductService {
     }
 
     private ProductStatus calculateStatus(Integer quantity, ProductStatus currentStatus) {
-        if (quantity == 0) {
+        if (quantity == null || quantity == 0) {
             return ProductStatus.OUT_OF_STOCK;
         } else if (quantity < 10) { // Threshold for low stock
             return ProductStatus.LOW_STOCK;
