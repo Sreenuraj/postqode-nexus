@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ProductCatalogPage } from '../ProductCatalogPage';
 import { AuthProvider } from '../../context/AuthContext';
@@ -139,7 +139,7 @@ describe('ProductCatalogPage', () => {
 
   it('filters products by search', async () => {
     const mockGetAll = vi.mocked(productApi.getAll);
-    
+
     renderProductCatalog();
 
     await waitFor(() => {
@@ -162,7 +162,7 @@ describe('ProductCatalogPage', () => {
 
   it('filters products by status', async () => {
     const mockGetAll = vi.mocked(productApi.getAll);
-    
+
     renderProductCatalog();
 
     await waitFor(() => {
@@ -190,7 +190,7 @@ describe('ProductCatalogPage', () => {
 
   it('sorts products', async () => {
     const mockGetAll = vi.mocked(productApi.getAll);
-    
+
     renderProductCatalog();
 
     await waitFor(() => {
@@ -246,7 +246,7 @@ describe('ProductCatalogPage', () => {
 
   it('refreshes product list', async () => {
     const mockGetAll = vi.mocked(productApi.getAll);
-    
+
     renderProductCatalog();
 
     await waitFor(() => {
@@ -262,7 +262,7 @@ describe('ProductCatalogPage', () => {
       const svg = btn.querySelector('svg');
       return svg !== null && btn.getAttribute('type') !== 'submit';
     });
-    
+
     if (refreshButton) {
       fireEvent.click(refreshButton);
 
@@ -312,7 +312,7 @@ describe('ProductCatalogPage', () => {
 
   it('uses correct page indexing (0-based for backend)', async () => {
     const mockGetAll = vi.mocked(productApi.getAll);
-    
+
     renderProductCatalog();
 
     await waitFor(() => {

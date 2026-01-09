@@ -301,6 +301,7 @@ postqode-nexus/
 | `scripts/start-backend.sh` | Start backend only |
 | `scripts/start-frontend.sh` | Start frontend only |
 | `scripts/start-all.sh` | Start all via Docker Compose |
+| `scripts/stop-all.sh` | Stop all Docker Compose services |
 
 **Backend Dependency (already added):**
 ```xml

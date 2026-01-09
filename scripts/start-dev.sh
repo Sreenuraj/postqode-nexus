@@ -27,6 +27,12 @@ check_prereqs() {
     echo -e "${GREEN}✅ All prerequisites met${NC}"
 }
 
+# Load .env variables if present
+if [ -f "$PROJECT_ROOT/.env" ]; then
+    echo "📄 Loading environment variables from .env..."
+    export $(grep -v '^#' "$PROJECT_ROOT/.env" | xargs)
+fi
+
 # Start database
 start_db() {
     echo ""
@@ -87,13 +93,13 @@ start_frontend() {
     fi
     
     # Check if already running
-    if lsof -Pi :5173 -sTCP:LISTEN -t >/dev/null 2>&1; then
-        echo -e "${YELLOW}   Already running on port 5173${NC}"
+    if lsof -Pi :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then
+        echo -e "${YELLOW}   Already running on port 3000${NC}"
     else
         nohup npm run dev > /tmp/nexus-frontend.log 2>&1 &
         echo "   PID: $!"
         sleep 3
-        echo -e "${GREEN}   ✅ Frontend ready on port 5173${NC}"
+        echo -e "${GREEN}   ✅ Frontend ready on port 3000${NC}"
     fi
 }
 
@@ -112,7 +118,7 @@ echo -e "${BLUE}🔗 Access URLs:${NC}"
 echo "   • Backend API:  http://localhost:8080"
 echo "   • Swagger UI:   http://localhost:8080/swagger-ui.html"
 echo "   • GraphQL:      http://localhost:8080/graphql"
-echo "   • Frontend:     http://localhost:5173"
+echo "   • Frontend:     http://localhost:3000"
 echo ""
 echo -e "${BLUE}📊 Demo Credentials:${NC}"
 echo "   • Admin: admin / Admin@123"

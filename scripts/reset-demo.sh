@@ -56,8 +56,8 @@ echo "🌱 Reloading demo data..."
 # Reload demo data using the V2 migration SQL
 docker exec nexus-db psql -U nexus -d nexus -c "
 -- Update password hashes (in case they were changed)
-UPDATE users SET password_hash = '\$2a\$10\$dXJ3SW6G7P50lGmMkkmwe.20cyhQQl3MpKVWpxUPNdSO9IHzK8IWO' WHERE username = 'admin';
-UPDATE users SET password_hash = '\$2a\$10\$e0MYzXyjpJS7Pd2ALxqrC.1WR8xCzGNsRYqjr/Oj0KhNoUyvgNe/i' WHERE username = 'user';
+UPDATE users SET password_hash = '$2a$12$kvqxOUCFbdg0FTFj6AHmbeO5C8nSF0lWzFWLzQxt27vjnUhFGTrqm' WHERE username = 'admin';
+UPDATE users SET password_hash = '$2a$12$9lhT.A3FYzeydONBam65XeCWiODK.emGC4NUXazZHj5T/VmHI6DVO' WHERE username = 'user';
 
 -- Insert demo products (20 items)
 INSERT INTO products (id, sku, name, description, price, quantity, status, created_by) VALUES

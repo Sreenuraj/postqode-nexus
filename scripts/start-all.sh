@@ -24,7 +24,7 @@ if [ ! -f "$PROJECT_ROOT/.env" ]; then
 fi
 
 echo "🐳 Starting Docker Compose services..."
-docker-compose up -d
+docker-compose --env-file "$PROJECT_ROOT/.env" up -d --build
 
 echo ""
 echo "⏳ Waiting for services to be ready..."
