@@ -16,6 +16,9 @@ Phase 3.1 adds major new functionality to PostQode Nexus including Category Mana
 
 **Current Status**: Backend implementation complete and tested. Frontend implementation pending.
 
+> **⚠️ IMPORTANT NOTE FOR FUTURE DEVELOPERS**  
+> A critical authentication bug was fixed on 2026-01-09: Controllers (OrderController, UserInventoryController) were incorrectly parsing `authentication.getName()` as UUID. The JWT token stores **username** not UUID. Controllers now use `UserRepository.findByUsername()` to get the user. Follow this pattern for any new controllers that need user context.
+
 ---
 
 ## Implementation Progress
@@ -197,7 +200,7 @@ CREATE TRIGGER update_user_inventory_updated_at BEFORE UPDATE ON user_inventory
 - [ ] Update `Layout.tsx` to add Categories link (Admin only)
 
 #### Testing
-- [ ] Unit tests for CategoryService
+- [x] Unit tests for CategoryService
 - [ ] Integration tests for CategoryController
 - [ ] Manual testing checklist
 
@@ -212,7 +215,7 @@ CREATE TRIGGER update_user_inventory_updated_at BEFORE UPDATE ON user_inventory
 #### Backend Implementation
 
 ##### Models
-- [ ] Update `User.java` - Add `isEnabled` field
+- [x] Update `User.java` - Add `isEnabled` field ✅ Fixed
 - [ ] `UserRequest.java` - DTO for create/update
 - [ ] `UserResponse.java` - DTO for responses
 
@@ -327,10 +330,10 @@ CREATE TRIGGER update_user_inventory_updated_at BEFORE UPDATE ON user_inventory
 - [ ] Order quantity cannot exceed product quantity
 
 #### Testing
-- [ ] Unit tests for OrderService
+- [x] Unit tests for OrderService ✅ (9 tests: create, approve, reject, cancel)
 - [ ] Integration tests for order approval flow
 - [ ] Manual testing checklist
-- [ ] Test stock reduction logic
+- [x] Test stock reduction logic ✅
 
 ---
 
@@ -392,7 +395,7 @@ CREATE TRIGGER update_user_inventory_updated_at BEFORE UPDATE ON user_inventory
 - [ ] MANUAL items can be fully managed
 
 #### Testing
-- [ ] Unit tests for UserInventoryService
+- [x] Unit tests for UserInventoryService ✅ (9 tests: MANUAL/PURCHASED rules, ownership)
 - [ ] Integration tests for inventory operations
 - [ ] Manual testing checklist
 
