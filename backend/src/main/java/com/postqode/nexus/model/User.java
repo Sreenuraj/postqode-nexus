@@ -35,6 +35,10 @@ public class User {
     @Column(nullable = false)
     private UserRole role;
 
+    @Column(name = "is_enabled")
+    @Builder.Default
+    private Boolean isEnabled = true;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
