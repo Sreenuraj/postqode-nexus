@@ -37,7 +37,7 @@ public class GraphQLController implements GraphQLQueryResolver {
         int p = page != null ? page : 0;
         int s = pageSize != null ? pageSize : 10;
 
-        Page<ProductResponse> productPage = productService.getProducts(status, search, PageRequest.of(p, s));
+        Page<ProductResponse> productPage = productService.getProducts(status, null, search, PageRequest.of(p, s));
 
         return ProductConnection.builder()
                 .items(productPage.getContent())

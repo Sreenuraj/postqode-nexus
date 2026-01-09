@@ -245,6 +245,7 @@ export const ProductCatalogPage: React.FC = () => {
             <TableRow>
               <TableHead>SKU</TableHead>
               <TableHead>Name</TableHead>
+              <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>Status</TableHead>
@@ -275,6 +276,7 @@ export const ProductCatalogPage: React.FC = () => {
                 <TableRow key={product.id} id={`catalog-row-${product.id}`}>
                   <TableCell className="font-mono text-sm">{product.sku}</TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
+                  <TableCell className="text-sm text-slate-600">{(product as any).categoryName || '-'}</TableCell>
                   <TableCell>${product.price.toFixed(2)}</TableCell>
                   <TableCell>{product.quantity}</TableCell>
                   <TableCell>{getStatusBadge(product.status)}</TableCell>

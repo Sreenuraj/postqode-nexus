@@ -36,7 +36,7 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
     price: '',
     quantity: '',
     status: 'ACTIVE',
-    categoryId: '',
+    categoryId: 'none',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -44,28 +44,52 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
   const [categories, setCategories] = useState<any[]>([]);
 
   useEffect(() => {
+    console.log('ProductFormDialog mounted. Product:', product);
     const loadCategories = async () => {
       try {
         const data = await categoryApi.getAll();
-        setCategories(data);
+        console.log('Categories loaded:', data);
+        if (Array.isArray(data)) {
+          setCategories(data);
+          // Log comparison if product exists
+          if (product && product.categoryId) {
+            const match = data.find((c: any) => c.id === product.categoryId);
+            console.log('Category match check:', {
+              productCategoryId: product.categoryId,
+              foundMatch: !!match,
+              availableCategoryIds: data.map((c: any) => c.id)
+            });
+          }
+        } else {
+          console.error('Categories data is not an array:', data);
+          setCategories([]);
+        }
       } catch (error) {
         console.error('Error loading categories:', error);
+        setCategories([]);
       }
     };
     loadCategories();
-  }, []);
+  }, [product]); // Added product dependency to re-check when product changes
 
   useEffect(() => {
+    console.log('Product changed:', product);
     if (product) {
-      setFormData({
-        sku: product.sku,
-        name: product.name,
-        description: product.description || '',
-        price: product.price.toString(),
-        quantity: product.quantity.toString(),
-        status: product.status,
-        categoryId: (product as any).categoryId || '',
-      });
+      try {
+        const newFormData = {
+          sku: product.sku || '',
+          name: product.name || '',
+          description: product.description || '',
+          price: product.price !== undefined && product.price !== null ? product.price.toString() : '',
+          quantity: product.quantity !== undefined && product.quantity !== null ? product.quantity.toString() : '',
+          status: product.status || 'ACTIVE',
+          categoryId: product.categoryId || 'none',
+        };
+        console.log('Setting form data:', newFormData);
+        setFormData(newFormData);
+      } catch (e) {
+        console.error('Error setting form data:', e);
+      }
     } else {
       // Generate next SKU
       const nextSku = `PRD-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
@@ -129,7 +153,7 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
         status: formData.status,
       };
 
-      if (formData.categoryId) {
+      if (formData.categoryId && formData.categoryId !== 'none') {
         payload.categoryId = formData.categoryId;
       }
 
@@ -251,23 +275,31 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor="product-category">Category</Label>
-            <Select
-              value={formData.categoryId}
-              onValueChange={(value) => setFormData({ ...formData, categoryId: value })}
-              disabled={loading}
-            >
-              <SelectTrigger id="product-category">
-                <SelectValue placeholder="Select category (optional)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">No Category</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {categories.length === 0 ? (
+              <div className="flex h-10 w-full items-center rounded-md border border-input bg-transparent px-3 py-2 text-sm text-muted-foreground">
+                Loading categories...
+              </div>
+            ) : (
+              <Select
+                value={formData.categoryId || 'none'}
+                onValueChange={(value) => setFormData({ ...formData, categoryId: value })}
+                disabled={loading}
+              >
+                <SelectTrigger id="product-category">
+                  <SelectValue placeholder="Select category (optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No Category</SelectItem>
+                  {Array.isArray(categories) && categories.map((cat) => (
+                    cat && cat.id ? (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ) : null
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="space-y-2">

@@ -54,7 +54,7 @@ public class GraphQLControllerTest {
 
         Page<ProductResponse> page = new PageImpl<>(Collections.singletonList(response), PageRequest.of(0, 10), 1);
 
-        when(productService.getProducts(any(), any(), any())).thenReturn(page);
+        when(productService.getProducts(any(), any(), any(), any())).thenReturn(page);
 
         ProductConnection connection = graphQLController.products(null, null, 0, 10);
 
@@ -77,7 +77,7 @@ public class GraphQLControllerTest {
         Page<ProductResponse> page = new PageImpl<>(Collections.singletonList(lowStockProduct), PageRequest.of(0, 10),
                 1);
 
-        when(productService.getProducts(eq(ProductStatus.LOW_STOCK), any(), any())).thenReturn(page);
+        when(productService.getProducts(eq(ProductStatus.LOW_STOCK), any(), any(), any())).thenReturn(page);
 
         ProductConnection connection = graphQLController.products(null, ProductStatus.LOW_STOCK, 0, 10);
 
@@ -95,7 +95,7 @@ public class GraphQLControllerTest {
 
         Page<ProductResponse> page = new PageImpl<>(Collections.singletonList(product), PageRequest.of(0, 10), 1);
 
-        when(productService.getProducts(any(), eq("laptop"), any())).thenReturn(page);
+        when(productService.getProducts(any(), any(), eq("laptop"), any())).thenReturn(page);
 
         ProductConnection connection = graphQLController.products("laptop", null, 0, 10);
 

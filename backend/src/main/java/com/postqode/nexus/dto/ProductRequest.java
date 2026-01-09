@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -35,4 +36,6 @@ public class ProductRequest {
     private Integer quantity;
 
     private ProductStatus status;
+
+    private UUID categoryId;
 }

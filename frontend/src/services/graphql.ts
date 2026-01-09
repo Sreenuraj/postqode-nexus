@@ -176,6 +176,8 @@ export interface Product {
   price: number;
   quantity: number;
   status: string;
+  categoryId?: string;
+  categoryName?: string;
   createdAt: string;
   updatedAt: string;
 }

@@ -51,9 +51,10 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<Page<ProductResponse>> getProducts(
             @Parameter(description = "Filter by product status") @RequestParam(required = false) ProductStatus status,
+            @Parameter(description = "Filter by category ID") @RequestParam(required = false) UUID categoryId,
             @Parameter(description = "Search by product name or SKU") @RequestParam(required = false) String search,
             @Parameter(description = "Pagination parameters (page, size, sort)") @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(productService.getProducts(status, search, pageable));
+        return ResponseEntity.ok(productService.getProducts(status, categoryId, search, pageable));
     }
 
     @Operation(

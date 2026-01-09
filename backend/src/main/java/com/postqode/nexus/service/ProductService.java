@@ -6,20 +6,26 @@ import com.postqode.nexus.dto.ProductRequest;
 import com.postqode.nexus.dto.ProductResponse;
 import com.postqode.nexus.model.ActionType;
 import com.postqode.nexus.model.ActivityLog;
+import com.postqode.nexus.model.Category;
 import com.postqode.nexus.model.Product;
 import com.postqode.nexus.model.ProductStatus;
 import com.postqode.nexus.model.User;
 import com.postqode.nexus.repository.ActivityLogRepository;
+import com.postqode.nexus.repository.CategoryRepository;
 import com.postqode.nexus.repository.ProductRepository;
 import com.postqode.nexus.repository.UserRepository;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -29,18 +35,36 @@ import java.util.UUID;
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
     private final ActivityLogRepository activityLogRepository;
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
     @Transactional(readOnly = true)
-    public Page<ProductResponse> getProducts(ProductStatus status, String search, Pageable pageable) {
-        Page<Product> products;
-        if (status != null || search != null) {
-            products = productRepository.findByStatusAndSearch(status, search, pageable);
-        } else {
-            products = productRepository.findAll(pageable);
-        }
+    public Page<ProductResponse> getProducts(ProductStatus status, UUID categoryId, String search, Pageable pageable) {
+        Specification<Product> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+
+            if (categoryId != null) {
+                predicates.add(cb.equal(root.get("category").get("id"), categoryId));
+            }
+
+            if (search != null && !search.trim().isEmpty()) {
+                String searchPattern = "%" + search.trim().toLowerCase() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("name")), searchPattern),
+                        cb.like(cb.lower(root.get("sku")), searchPattern)
+                ));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<Product> products = productRepository.findAll(spec, pageable);
         return products.map(this::mapToResponse);
     }
 
@@ -60,6 +84,12 @@ public class ProductService {
         User currentUser = getCurrentUser();
         ProductStatus status = calculateStatus(request.getQuantity(), request.getStatus());
 
+        Category category = null;
+        if (request.getCategoryId() != null) {
+            category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+        }
+
         Product product = Product.builder()
                 .sku(request.getSku())
                 .name(request.getName())
@@ -67,6 +97,7 @@ public class ProductService {
                 .price(request.getPrice())
                 .quantity(request.getQuantity())
                 .status(status)
+                .category(category)
                 .createdBy(currentUser)
                 .updatedBy(currentUser)
                 .build();
@@ -95,6 +126,14 @@ public class ProductService {
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setQuantity(request.getQuantity());
+
+        if (request.getCategoryId() != null) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+            product.setCategory(category);
+        } else {
+            product.setCategory(null);
+        }
 
         // Auto-update status based on quantity if not explicitly provided or if logic
         // dictates
@@ -201,6 +240,8 @@ public class ProductService {
                 .price(product.getPrice())
                 .quantity(product.getQuantity())
                 .status(product.getStatus())
+                .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
+                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
                 .createdBy(product.getCreatedBy() != null ? product.getCreatedBy().getUsername() : null)
                 .updatedBy(product.getUpdatedBy() != null ? product.getUpdatedBy().getUsername() : null)
                 .createdAt(product.getCreatedAt())

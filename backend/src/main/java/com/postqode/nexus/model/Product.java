@@ -24,10 +24,10 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true, nullable = false, length = 50, columnDefinition = "VARCHAR(50)")
     private String sku;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200, columnDefinition = "VARCHAR(200)")
     private String name;
 
     @Column(columnDefinition = "TEXT")

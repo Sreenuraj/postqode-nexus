@@ -23,6 +23,8 @@ public class ProductResponse {
     private BigDecimal price;
     private Integer quantity;
     private ProductStatus status;
+    private UUID categoryId;
+    private String categoryName;
     private String createdBy;
     private String updatedBy;
     private LocalDateTime createdAt;
