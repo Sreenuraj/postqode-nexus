@@ -21,7 +21,7 @@ public class JwtTokenProvider {
     @Value("${jwt.secret:demo-secret-key-must-be-at-least-256-bits-long-for-security-purposes}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration:86400000}")
+    @Value("${jwt.expiration:604800000}")
     private long jwtExpiration;
 
     public String generateToken(Authentication authentication) {
@@ -29,7 +29,7 @@ public class JwtTokenProvider {
         String roles = userPrincipal.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
-        
+
         return Jwts.builder()
                 .subject(userPrincipal.getUsername())
                 .claim("roles", roles)
@@ -47,7 +47,7 @@ public class JwtTokenProvider {
                 .signWith(getSignInKey())
                 .compact();
     }
-    
+
     public String getRolesFromToken(String token) {
         Claims claims = extractAllClaims(token);
         return claims.get("roles", String.class);

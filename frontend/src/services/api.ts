@@ -180,6 +180,10 @@ export const userInventoryApi = {
     const response = await api.delete(`/user-inventory/${id}`);
     return response.data;
   },
+  consumeItem: async (id: string, quantity: number) => {
+    const response = await api.post(`/user-inventory/${id}/consume`, { quantity });
+    return response.data;
+  },
 };
 
 // User Management API

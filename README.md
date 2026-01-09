@@ -37,7 +37,7 @@ This is a **long-living demo asset** for:
 ### User Screens
 1. **Product Catalog** — Browse, search, filter by category, place orders
 2. **My Orders** — View order history, cancel pending orders
-3. **My Inventory** — Personal inventory (auto-created from orders + manual items)
+3. **My Inventory** — Personal inventory (auto-created from orders, merge duplicates, consume items)
 
 ### Common Screens
 1. **Login** — Role-based authentication

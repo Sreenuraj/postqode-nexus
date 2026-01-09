@@ -63,7 +63,8 @@ public class OrderService {
 
         // Create order in PENDING status
         Order order = new Order(user, product, quantity, Order.OrderStatus.PENDING);
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        return orderRepository.findByIdWithDetails(savedOrder.getId()).orElse(savedOrder);
     }
 
     /**
@@ -100,7 +101,7 @@ public class OrderService {
                 product.getName(),
                 order.getQuantity());
 
-        return approvedOrder;
+        return orderRepository.findByIdWithDetails(approvedOrder.getId()).orElse(approvedOrder);
     }
 
     /**
@@ -115,7 +116,8 @@ public class OrderService {
         }
 
         order.setStatus(Order.OrderStatus.REJECTED);
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        return orderRepository.findByIdWithDetails(savedOrder.getId()).orElse(savedOrder);
     }
 
     /**
@@ -134,6 +136,7 @@ public class OrderService {
         }
 
         order.setStatus(Order.OrderStatus.CANCELLED);
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        return orderRepository.findByIdWithDetails(savedOrder.getId()).orElse(savedOrder);
     }
 }

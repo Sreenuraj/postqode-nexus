@@ -78,6 +78,7 @@ This is a **demo application** that showcases:
 | View Order History | ✓ |
 | Manage Own Orders | ✓ |
 | Manage Personal Inventory (CRUD) | ✓ |
+| Consume/Remove Items | ✓ |
 
 **Demo Credentials**:
 - Username: `user`
@@ -378,9 +379,11 @@ This is a **demo application** that showcases:
 | **Edit Item (Update)** | Edit details (Name, Notes) of owned items. |
 | **Delete Item (Delete)** | Remove item from personal inventory. |
 | **View Details (Read)** | See item details. |
+| **Consume Item** | Decrease quantity (auto-remove if 0). |
 
 #### Integration with Orders
 - When an Order is **APPROVED**, the products are automatically added to this list.
+- **Merge Logic**: If the user already has the product (Source: PURCHASED), the quantity is incremented instead of creating a duplicate entry.
 - Users can modifications to these records without affecting the global catalog.
 
 #### Data Fields (User Inventory Item)
@@ -709,7 +712,7 @@ Same layout as Add Product, pre-filled with existing data.
 
 #### Session Timeout
 
-- **Duration**: 24 hours (configurable)
+- **Duration**: 7 days (configurable)
 - **Warning**: Show warning 5 minutes before expiry
 - **Behavior**: Automatic logout, redirect to login
 

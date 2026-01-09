@@ -123,4 +123,36 @@ public class UserInventoryController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @PostMapping("/{id}/consume")
+    @Operation(summary = "Consume inventory item", description = "Decrease quantity of an inventory item. Item is removed if quantity reaches 0.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Item consumed successfully (updated or removed)"),
+            @ApiResponse(responseCode = "400", description = "Invalid quantity or insufficient stock"),
+            @ApiResponse(responseCode = "404", description = "Inventory item not found")
+    })
+    public ResponseEntity<?> consumeInventoryItem(
+            @Parameter(description = "Inventory item ID") @PathVariable UUID id,
+            @RequestBody Map<String, Integer> request,
+            Authentication authentication) {
+        try {
+            User user = userRepository.findByUsername(authentication.getName())
+                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+            Integer quantity = request.get("quantity");
+            if (quantity == null) {
+                return ResponseEntity.badRequest().body("Quantity is required");
+            }
+
+            UserInventory updatedItem = userInventoryService.consumeInventoryItem(id, user.getId(), quantity);
+
+            if (updatedItem == null) {
+                return ResponseEntity.ok(Map.of("message", "Item fully consumed and removed from inventory"));
+            } else {
+                return ResponseEntity.ok(updatedItem);
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

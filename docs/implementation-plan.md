@@ -447,6 +447,8 @@ postqode-nexus/
 | ✅ 3.1.4 | Feature: Order System | Backend API + User/Admin UI | Complete |
 | ✅ 3.1.5 | Feature: User Inventory | Backend API + User UI (CRUD) | Complete |
 | ✅ 3.1.6 | Product Catalog Refactor | Categorized view, Order integration | Complete |
+| ✅ 3.1.7 | Inventory Enhancements | Merge duplicate purchases, Consume items | Complete |
+| ✅ 3.1.8 | Session Stability | Extend JWT expiry to 7 days | Complete |
 
 **Detailed Functional Specs:**
 
@@ -492,6 +494,7 @@ postqode-nexus/
 | 9 | My Inventory | User > My Inventory | Shows Purchased Items |
 | 10 | Edit Owned Item | User > My Inventory > Edit | Updates Detail |
 | 11 | Add Personal Item | User > My Inventory > Add | Adds New Item |
+| 12 | Consume Item | User > My Inventory > Consume | Qty Decreases / Item Removed |
 
 **Sign-off**: [x] All tests passing — ✅ Phase 3.1 Complete (2026-01-09)
 
