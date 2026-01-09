@@ -437,6 +437,66 @@ postqode-nexus/
 
 ---
 
+### Phase 3.1: Enhanced Functionality (Week 6-7)
+
+| Task | Description | Deliverables | Functional Reference |
+|------|-------------|--------------|---------------------|
+| 3.1.1 | Database Enhancements | Schema for Categories, Orders, User status | [Data Models](./application-functionality.md#6-data-models) |
+| 3.1.2 | Feature: Category Management | Backend API + Admin UI | [Category Management](./application-functionality.md#46-category-management-admin-only) |
+| 3.1.3 | Feature: User Management | Backend API + Admin UI | [User Management](./application-functionality.md#47-user-management-admin-only) |
+| 3.1.4 | Feature: Order System | Backend API + User/Admin UI | [Order Management](./application-functionality.md#48-order-management) |
+| 3.1.5 | Feature: User Inventory | Backend API + User UI (CRUD) | [My Inventory](./application-functionality.md#49-my-inventory-user) |
+| 3.1.6 | Product Catalog Refactor | Categorized view, Order integration | [Product Catalog Screen](./application-functionality.md#42-product-catalog-screen) |
+
+**Detailed Functional Specs:**
+
+#### 3.1.1 Category Management
+- **Components**: List, Add Modal, Edit Modal, Delete confirmation.
+- **Rules**: Products can trigger category creation or mapping.
+
+#### 3.1.2 User Management
+- **Components**: User table, Enable/Disable toggle, Add/Edit User modal.
+- **Security**: Admin only access.
+
+#### 3.1.3 Order System
+- **User**: "Buy" action on product -> "My Orders" screen.
+- **Admin**: "Order Management" screen -> Approve/Reject.
+- **Logic**: Stock reduction only on approval.
+
+#### 3.1.5 User Inventory
+- **Components**: "My Inventory" Page, Add/Edit Item Modal.
+- **Integration**: Auto-add approved order items.
+- **Actions**: CRUD (Create, Read, Update, Delete).
+
+#### 🧪 Phase 3.1 Testing
+
+| Test Type | Test | Command/Steps |
+|-----------|------|---------------|
+| Unit | Order Service logic | `mvn test -Dtest=OrderServiceTest` |
+| Unit | Category Service logic | `mvn test -Dtest=CategoryServiceTest` |
+| E2E | Full Order Flow | `npx playwright test order-flow.spec.ts` |
+| E2E | Admin Category/User | `npx playwright test admin-features.spec.ts` |
+
+#### Low-Level Manual Testing Checklist
+
+| # | Test | Steps | Expected Result |
+|---|------|-------|----------------|
+| 1 | Create Category | Admin > Categories > Add | Category appears |
+| 2 | Assign Category | Edit Product > Select Category | Saved correctly |
+| 3 | Filter by Category| Catalog > Select Category | Filters list |
+| 4 | Create User | Admin > Users > Add | User created |
+| 5 | Disable User | Admin > Users > Toggle | User cannot login |
+| 6 | Place Order | User > Buy Product | Order stats "Pending" |
+| 7 | Approve Order | Admin > Orders > Approve | Stock reduced, Added to User Inv |
+| 8 | Reject Order | Admin > Orders > Reject | Stock unchanged |
+| 9 | My Inventory | User > My Inventory | Shows Purchased Items |
+| 10 | Edit Owned Item | User > My Inventory > Edit | Updates Detail |
+| 11 | Add Personal Item | User > My Inventory > Add | Adds New Item |
+
+**Sign-off**: [ ] All tests passing — Ready for Phase 4
+
+---
+
 ### Phase 4: Mobile Development (Week 7-8)
 
 | Task | Description | Deliverables | Functional Reference |
@@ -448,6 +508,8 @@ postqode-nexus/
 | 4.5 | Dashboard | Mobile-optimized charts | [Dashboard Screen](./application-functionality.md#44-dashboard-screen-admin-only) |
 | 4.6 | Navigation | Stack/tab navigation | [Bottom Navigation (Mobile)](./application-functionality.md#52-bottom-navigation-mobile) |
 | 4.7 | Mobile startup script | scripts/start-mobile.sh | – |
+| 4.8 | Mobile: Category/User | Admin mobile features | [Category Management](./application-functionality.md#46-category-management-admin-only) |
+| 4.9 | Mobile: Orders & Inventory | User mobile features | [My Inventory](./application-functionality.md#49-my-inventory-user) |
 
 **Mobile-Specific References:**
 - **Breakpoints**: [Breakpoints](./application-functionality.md#101-breakpoints)
@@ -477,6 +539,8 @@ postqode-nexus/
 | 8 | Navigation | Both | Switch between tabs | Correct screens |
 | 9 | Offline | Both | Turn off network | Graceful error |
 | 10 | Web parity | Both | Compare with web | Same functionality |
+| 11 | Place Order | Mobile | Add to cart, checkout | Order created |
+| 12 | My Inventory | Mobile | View owned items | List displayed |
 
 **Sign-off**: [ ] All tests passing — Ready for Phase 5
 
@@ -539,6 +603,7 @@ postqode-nexus/
 **Test Scenarios:**
 - **Admin Flow**: [Admin Demo Flow (5 minutes)](./application-functionality.md#121-admin-demo-flow-5-minutes)
 - **User Flow**: [User Demo Flow (3 minutes)](./application-functionality.md#122-user-demo-flow-3-minutes)
+- **Order Flow**: Verify stock reduction logic and inventory syncing
 
 #### 🧪 Phase 6 Testing (Meta-Testing)
 

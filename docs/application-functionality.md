@@ -49,6 +49,9 @@ This is a **demo application** that showcases:
 | Change Product Status | ✓ |
 | View Dashboard Analytics | ✓ |
 | View Activity Logs | ✓ |
+| Manage Categories | ✓ |
+| Manage Users | ✓ |
+| Manage Orders | ✓ |
 
 **Demo Credentials**:
 - Username: `admin`
@@ -71,6 +74,10 @@ This is a **demo application** that showcases:
 | Change Product Status | ✗ |
 | View Dashboard Analytics | ✗ |
 | View Activity Logs | ✗ |
+| Place Orders | ✓ |
+| View Order History | ✓ |
+| Manage Own Orders | ✓ |
+| Manage Personal Inventory (CRUD) | ✓ |
 
 **Demo Credentials**:
 - Username: `user`
@@ -87,6 +94,17 @@ This is a **demo application** that showcases:
                       │                        │                       │
                       │                        │                       │
                   [All Users]              [Admin Only]            [Admin Only]
+                      │                        │
+                      v                        v
+              ┌────────────────┐       ┌────────────────┐
+              │  ORDER FLOW    │       │ USER & CAT MGT │
+              └────────────────┘       └────────────────┘
+                     │ [User]             [Admin Only]
+                     v
+              ┌────────────────┐
+              │  MY INVENTORY  │
+              └────────────────┘
+                     [User]
 ```
 
 ---
@@ -262,6 +280,115 @@ This is a **demo application** that showcases:
 - **Page size**: 10 items (configurable: 10, 25, 50)
 - **Controls**: Previous, Next, Page numbers
 - **Display**: "Showing X-Y of Z products"
+- **Category Grouping**: Option to view products grouped by category
+
+---
+
+### 4.6 Category Management (Admin Only)
+
+**Purpose**: Organize products into categories.
+
+#### Functionality
+
+| Feature | Description |
+|---------|-------------|
+| **List Categories** | View all categories |
+| **Add Category** | Create new category (Name, Description) |
+| **Edit Category** | Update category details |
+| **Delete Category** | Remove category (if no products attached) |
+
+#### Data Fields
+
+| Field | Description |
+|-------|-------------|
+| Name | Category name (unique) |
+| Description | Optional description |
+
+---
+
+### 4.7 User Management (Admin Only)
+
+**Purpose**: Manage system users.
+
+#### Functionality
+
+| Feature | Description |
+|---------|-------------|
+| **List Users** | View all users and their roles |
+| **Add User** | Create new user (Username, Password, Role) |
+| **Update User** | Update password or toggle status |
+| **Enable/Disable** | Activate or deactivate user access |
+
+#### Add/Edit User Modal
+
+- **Username**: Text (Required, Unique)
+- **Password**: Password (Required for creation, optional for update)
+- **Role**: Admin/User
+- **Status**: Enabled/Disabled
+
+---
+
+### 4.8 Order Management
+
+**Purpose**: Allow users to purchase products and admins to approve them.
+
+#### 4.8.1 Place Order (User)
+
+**Trigger**: "Buy Now" or "Add to Cart" -> Checkout from Product Catalog
+
+**Flow**:
+1. User selects product and quantity.
+2. User confirms order.
+3. Order status set to `PENDING`.
+
+#### 4.8.2 My Orders (User)
+
+**Features**:
+- List all orders placed by the user.
+- Filter by status (Pending, Approved, Rejected).
+- **Cancel Order**: User can cancel order if status is `PENDING`.
+
+#### 4.8.3 Manage Orders (Admin)
+
+**Features**:
+- View all orders.
+- Approve Order:
+  - Reduces Product Quantity.
+  - Changes status to `APPROVED`.
+- Reject Order:
+  - Changes status to `REJECTED`.
+
+**Business Logic**:
+- Cannot approve if product quantity < order quantity.
+- Stock is reduced ONLY upon approval.
+- **Approval Effect**: Approved orders automatically create entries in "My Inventory".
+
+---
+
+### 4.9 My Inventory (User)
+
+**Purpose**: Manage products owned by the user.
+
+#### Functionality
+
+| Feature | Description |
+|---------|-------------|
+| **List My Items** | View purchased and manually added items. |
+| **Add Item (Create)** | Manually add a personal item to inventory. |
+| **Edit Item (Update)** | Edit details (Name, Notes) of owned items. |
+| **Delete Item (Delete)** | Remove item from personal inventory. |
+| **View Details (Read)** | See item details. |
+
+#### Integration with Orders
+- When an Order is **APPROVED**, the products are automatically added to this list.
+- Users can modifications to these records without affecting the global catalog.
+
+#### Data Fields (User Inventory Item)
+- **Source**: "PURCHASED" or "MANUAL"
+- **Original Product ID**: Link to catalog (if purchased)
+- **Name**: Editable
+- **Quantity**: Editable
+- **Notes**: Personal user notes
 
 ---
 
@@ -647,9 +774,31 @@ Same layout as Add Product, pre-filled with existing data.
 | createdBy | UUID | User who created |
 | updatedBy | UUID | User who last updated |
 | createdAt | DateTime | Creation timestamp |
+| createdAt | DateTime | Creation timestamp |
+| updatedAt | DateTime | Last update timestamp |
+| categoryId | UUID | Foreign key to Category (optional) |
+
+### 6.2 Category
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | UUID | Unique identifier |
+| name | String | Category name (Unique) |
+| description | String | Description |
+
+### 6.3 Order
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | UUID | Unique identifier |
+| userId | UUID | User who placed order |
+| productId | UUID | Product ordered |
+| quantity | Integer | Quantity ordered |
+| status | Enum | PENDING, APPROVED, REJECTED, CANCELLED |
+| createdAt | DateTime | Creation timestamp |
 | updatedAt | DateTime | Last update timestamp |
 
-### 6.2 User
+### 6.4 User
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -658,8 +807,22 @@ Same layout as Add Product, pre-filled with existing data.
 | email | String | User email |
 | role | Enum | ADMIN, USER |
 | createdAt | DateTime | Registration date |
+| isEnabled | Boolean | Account status (True/False) |
 
-### 6.3 Activity Log
+### 6.5 UserInventoryItem
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | UUID | Unique identifier |
+| userId | UUID | Owner |
+| productId | UUID | Reference to Catalog Product (optional) |
+| name | String | Item name |
+| quantity | Integer | Quantity owned |
+| source | Enum | PURCHASED, MANUAL |
+| notes | String | User notes |
+| createdAt | DateTime | Creation timestamp |
+
+### 6.6 Activity Log
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -685,7 +848,16 @@ Same layout as Add Product, pre-filled with existing data.
 | Quantity Range | Must be 0 or positive integer |
 | Auto-Status | Quantity 0 = Out of Stock |
 
-### 7.2 Access Rules
+### 7.2 Order Rules
+
+| Rule | Description |
+|------|-------------|
+| Stock Reduction | Stock decreases only when Admin approves order |
+| Insufficient Stock | Admin cannot approve order if stock < order qty |
+| Cancellation | User can only cancel PENDING orders |
+| Modification | Approved orders cannot be modified |
+
+### 7.3 Access Rules
 
 | Rule | Description |
 |------|-------------|
@@ -694,7 +866,7 @@ Same layout as Add Product, pre-filled with existing data.
 | Modification Actions | Add/Edit/Delete require ADMIN role |
 | Token Expiry | JWT expires after 24 hours |
 
-### 7.3 Audit Rules
+### 7.4 Audit Rules
 
 | Rule | Description |
 |------|-------------|
@@ -823,12 +995,20 @@ Same layout as Add Product, pre-filled with existing data.
    - Change status to "Out of Stock"
    - Save changes
 
-5. **View Dashboard** (60s)
+   - Save changes
+   - **Assign Category** to product
+
+5. **Manage Orders** (60s)
+   - Navigate to Order Management
+   - Approve pending orders
+   - Verify stock reduction
+
+6. **View Dashboard** (60s)
    - Navigate to Dashboard
    - Observe updated metrics
    - View recent activity
 
-6. **Logout** (30s)
+7. **Logout** (30s)
    - Click Logout
    - Confirm session ended
 
@@ -844,11 +1024,19 @@ Same layout as Add Product, pre-filled with existing data.
    - Apply filters
    - Note: No edit buttons visible
 
-3. **Access Restriction** (30s)
-   - Try to access /dashboard
    - Observe access denied
 
-4. **Logout** (30s)
+4. **Buy Product** (60s)
+   - Select product -> Buy
+   - Confirm Order
+   - Go to "My Orders" -> See Pending
+
+5. **My Inventory** (30s)
+   - Go to "My Inventory"
+   - Add personal item manually
+   - View purchased items (after approval)
+
+6. **Logout** (30s)
    - Click Logout
    - Confirm session ended
 
