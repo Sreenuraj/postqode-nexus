@@ -12,7 +12,17 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Separator } from './ui/separator';
-import { Package, LayoutDashboard, LogOut, User } from 'lucide-react';
+import { 
+  Package, 
+  LayoutDashboard, 
+  LogOut, 
+  User, 
+  Tag, 
+  Users, 
+  ShoppingCart, 
+  ClipboardList,
+  Box 
+} from 'lucide-react';
 
 export const Layout: React.FC = () => {
   const { user, logout, isAdmin } = useAuth();
@@ -28,6 +38,11 @@ export const Layout: React.FC = () => {
 
   const navItems = [
     { path: '/products', label: 'Products', icon: Package, show: true },
+    { path: '/categories', label: 'Categories', icon: Tag, show: isAdmin },
+    { path: '/users', label: 'Users', icon: Users, show: isAdmin },
+    { path: '/orders', label: 'Order Management', icon: ClipboardList, show: isAdmin },
+    { path: '/my-orders', label: 'My Orders', icon: ShoppingCart, show: !isAdmin },
+    { path: '/my-inventory', label: 'My Inventory', icon: Box, show: !isAdmin },
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, show: isAdmin },
   ];
 

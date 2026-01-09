@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { productApi } from '../services/api';
+import { productApi, categoryApi } from '../services/api';
 import { Product } from '../services/graphql';
 import {
   Dialog,
@@ -36,10 +36,24 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
     price: '',
     quantity: '',
     status: 'ACTIVE',
+    categoryId: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const data = await categoryApi.getAll();
+        setCategories(data);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      }
+    };
+    loadCategories();
+  }, []);
 
   useEffect(() => {
     if (product) {
@@ -50,6 +64,7 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
         price: product.price.toString(),
         quantity: product.quantity.toString(),
         status: product.status,
+        categoryId: (product as any).categoryId || '',
       });
     } else {
       // Generate next SKU
@@ -105,7 +120,7 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
 
     setLoading(true);
     try {
-      const payload = {
+      const payload: any = {
         sku: formData.sku,
         name: formData.name,
         description: formData.description || undefined,
@@ -113,6 +128,10 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
         quantity: parseInt(formData.quantity),
         status: formData.status,
       };
+
+      if (formData.categoryId) {
+        payload.categoryId = formData.categoryId;
+      }
 
       if (isEdit && product) {
         await productApi.update(product.id, payload);
@@ -228,6 +247,27 @@ export const ProductFormDialog: React.FC<ProductFormDialogProps> = ({
               />
               {errors.quantity && <p className="text-sm text-red-500">{errors.quantity}</p>}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="product-category">Category</Label>
+            <Select
+              value={formData.categoryId}
+              onValueChange={(value) => setFormData({ ...formData, categoryId: value })}
+              disabled={loading}
+            >
+              <SelectTrigger id="product-category">
+                <SelectValue placeholder="Select category (optional)" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">No Category</SelectItem>
+                {categories.map((cat) => (
+                  <SelectItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

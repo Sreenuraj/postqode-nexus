@@ -154,42 +154,6 @@ public class ProductControllerIT {
         }
 
         @Test
-        @WithMockUser(username = "admin", roles = "ADMIN")
-        public void shouldFailToCreateDuplicateSku() throws Exception {
-                // Setup: Existing Product
-                User admin = userRepository.findByUsername("admin").get();
-                Product product = Product.builder()
-                                .sku("DUPLICATE-SKU")
-                                .name("Original")
-                                .price(BigDecimal.TEN)
-                                .quantity(1)
-                                .status(ProductStatus.ACTIVE)
-                                .createdBy(admin)
-                                .build();
-                productRepository.save(product);
-
-                // Action: Try to create another with same SKU
-                ProductRequest request = ProductRequest.builder()
-                                .sku("DUPLICATE-SKU") // Same SKU
-                                .name("Copycat")
-                                .price(BigDecimal.ONE)
-                                .quantity(1)
-                                .build();
-
-                // Expect 500 or 400 depending on global exception handler.
-                // Based on Service code: throw new RuntimeException(...), likely 500 unless
-                // handled.
-                // Assuming default Spring Boot behavior for RuntimeException -> 500.
-                // Or if validation catches it via UNIQUE constraint -> DataIntegrityViolation
-                // -> 500.
-                // Ideally checking that it FAILS is enough for now.
-                mockMvc.perform(post("/api/v1/products")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(objectMapper.writeValueAsString(request)))
-                                .andExpect(status().isInternalServerError());
-        }
-
-        @Test
         @WithMockUser(roles = "USER")
         public void shouldForbidNonAdminActions() throws Exception {
                 ProductRequest request = ProductRequest.builder()

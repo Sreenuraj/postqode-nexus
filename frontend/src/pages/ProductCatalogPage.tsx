@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { productApi } from '../services/api';
+import { productApi, categoryApi, orderApi } from '../services/api';
 import { Product } from '../services/graphql';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -8,13 +8,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
 import { Badge } from '../components/ui/badge';
 import { Skeleton } from '../components/ui/skeleton';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../components/ui/dropdown-menu';
-import { Plus, Search, MoreVertical, Edit, Trash2, RefreshCw } from 'lucide-react';
+import { Plus, Search, MoreVertical, Edit, Trash2, RefreshCw, ShoppingCart } from 'lucide-react';
 import { toast } from 'sonner';
 import { ProductFormDialog } from '../components/ProductFormDialog';
 import { DeleteProductDialog } from '../components/DeleteProductDialog';
@@ -22,9 +23,11 @@ import { DeleteProductDialog } from '../components/DeleteProductDialog';
 export const ProductCatalogPage: React.FC = () => {
   const { isAdmin } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
+  const [categoryFilter, setCategoryFilter] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
   const [page, setPage] = useState(1);
@@ -36,6 +39,18 @@ export const ProductCatalogPage: React.FC = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+  const [buyDialogOpen, setBuyDialogOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [buyQuantity, setBuyQuantity] = useState(1);
+
+  const fetchCategories = async () => {
+    try {
+      const data = await categoryApi.getAll();
+      setCategories(data);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -55,6 +70,10 @@ export const ProductCatalogPage: React.FC = () => {
         params.status = statusFilter;
       }
 
+      if (categoryFilter !== 'ALL') {
+        params.categoryId = categoryFilter;
+      }
+
       const response = await productApi.getAll(params);
       setProducts(response.content || response.items || []);
       setTotalPages(response.totalPages || 1);
@@ -68,8 +87,12 @@ export const ProductCatalogPage: React.FC = () => {
   };
 
   useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
     fetchProducts();
-  }, [page, statusFilter, sortBy, sortOrder]);
+  }, [page, statusFilter, categoryFilter, sortBy, sortOrder]);
 
   // Debounced search
   useEffect(() => {
@@ -109,6 +132,25 @@ export const ProductCatalogPage: React.FC = () => {
   const handleProductDeleted = () => {
     fetchProducts();
     setDeletingProduct(null);
+  };
+
+  const handleBuy = async () => {
+    if (!selectedProduct) return;
+    try {
+      await orderApi.createOrder(selectedProduct.id, buyQuantity);
+      toast.success('Order placed successfully');
+      setBuyDialogOpen(false);
+      setSelectedProduct(null);
+      setBuyQuantity(1);
+    } catch (error: any) {
+      toast.error(error.response?.data || 'Failed to place order');
+    }
+  };
+
+  const openBuyDialog = (product: Product) => {
+    setSelectedProduct(product);
+    setBuyQuantity(1);
+    setBuyDialogOpen(true);
   };
 
   return (
@@ -154,6 +196,20 @@ export const ProductCatalogPage: React.FC = () => {
           </SelectContent>
         </Select>
 
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger id="catalog-select-category" className="w-full sm:w-[180px]">
+            <SelectValue placeholder="Filter by category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ALL">All Categories</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat.id} value={cat.id}>
+                {cat.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <Select
           value={`${sortBy}-${sortOrder}`}
           onValueChange={(value) => {
@@ -192,6 +248,7 @@ export const ProductCatalogPage: React.FC = () => {
               <TableHead>Price</TableHead>
               <TableHead>Quantity</TableHead>
               <TableHead>Status</TableHead>
+              {!isAdmin && <TableHead className="text-right">Actions</TableHead>}
               {isAdmin && <TableHead className="text-right">Actions</TableHead>}
             </TableRow>
           </TableHeader>
@@ -209,7 +266,7 @@ export const ProductCatalogPage: React.FC = () => {
               ))
             ) : products.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 6 : 5} className="text-center py-8 text-slate-500">
+                <TableCell colSpan={isAdmin ? 6 : 6} className="text-center py-8 text-slate-500">
                   No products found
                 </TableCell>
               </TableRow>
@@ -221,6 +278,19 @@ export const ProductCatalogPage: React.FC = () => {
                   <TableCell>${product.price.toFixed(2)}</TableCell>
                   <TableCell>{product.quantity}</TableCell>
                   <TableCell>{getStatusBadge(product.status)}</TableCell>
+                  {!isAdmin && (
+                    <TableCell className="text-right">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => openBuyDialog(product)}
+                        disabled={product.quantity === 0}
+                      >
+                        <ShoppingCart className="mr-2 h-4 w-4" />
+                        Buy
+                      </Button>
+                    </TableCell>
+                  )}
                   {isAdmin && (
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -303,6 +373,48 @@ export const ProductCatalogPage: React.FC = () => {
           product={deletingProduct}
         />
       )}
+
+      {/* Buy Dialog */}
+      <Dialog open={buyDialogOpen} onOpenChange={setBuyDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Buy Product</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Product: {selectedProduct?.name}</p>
+              <p className="text-sm text-slate-500">Price: ${selectedProduct?.price.toFixed(2)}</p>
+              <p className="text-sm text-slate-500">Available: {selectedProduct?.quantity}</p>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="quantity" className="text-sm font-medium">
+                Quantity
+              </label>
+              <Input
+                id="quantity"
+                type="number"
+                min="1"
+                max={selectedProduct?.quantity}
+                value={buyQuantity}
+                onChange={(e) => setBuyQuantity(Math.max(1, Math.min(selectedProduct?.quantity || 1, parseInt(e.target.value) || 1)))}
+              />
+            </div>
+            <div className="border-t pt-4">
+              <p className="text-lg font-semibold">
+                Total: ${((selectedProduct?.price || 0) * buyQuantity).toFixed(2)}
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setBuyDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleBuy} disabled={buyQuantity <= 0 || buyQuantity > (selectedProduct?.quantity || 0)}>
+              Place Order
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

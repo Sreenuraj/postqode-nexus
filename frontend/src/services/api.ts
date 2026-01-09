@@ -55,6 +55,7 @@ export const productApi = {
   getAll: async (params?: {
     search?: string;
     status?: string;
+    categoryId?: string;
     sortBy?: string;
     sortOrder?: string;
     page?: number;
@@ -74,6 +75,7 @@ export const productApi = {
     price: number;
     quantity: number;
     status?: string;
+    categoryId?: string;
   }) => {
     const response = await api.post('/products', product);
     return response.data;
@@ -83,6 +85,7 @@ export const productApi = {
     description?: string;
     price?: number;
     quantity?: number;
+    categoryId?: string;
   }) => {
     const response = await api.put(`/products/${id}`, product);
     return response.data;
@@ -95,6 +98,124 @@ export const productApi = {
     const response = await api.patch(`/products/${id}/status`, null, {
       params: { status },
     });
+    return response.data;
+  },
+};
+
+// Category API
+export const categoryApi = {
+  getAll: async () => {
+    const response = await api.get('/categories');
+    return response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/categories/${id}`);
+    return response.data;
+  },
+  create: async (category: { name: string; description?: string }) => {
+    const response = await api.post('/categories', category);
+    return response.data;
+  },
+  update: async (id: string, category: { name: string; description?: string }) => {
+    const response = await api.put(`/categories/${id}`, category);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    const response = await api.delete(`/categories/${id}`);
+    return response.data;
+  },
+};
+
+// Order API
+export const orderApi = {
+  getMyOrders: async () => {
+    const response = await api.get('/orders/my-orders');
+    return response.data;
+  },
+  getAllOrders: async () => {
+    const response = await api.get('/orders');
+    return response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/orders/${id}`);
+    return response.data;
+  },
+  createOrder: async (productId: string, quantity: number) => {
+    const response = await api.post('/orders', { productId, quantity });
+    return response.data;
+  },
+  approveOrder: async (id: string) => {
+    const response = await api.post(`/orders/${id}/approve`);
+    return response.data;
+  },
+  rejectOrder: async (id: string) => {
+    const response = await api.post(`/orders/${id}/reject`);
+    return response.data;
+  },
+  cancelOrder: async (id: string) => {
+    const response = await api.post(`/orders/${id}/cancel`);
+    return response.data;
+  },
+};
+
+// User Inventory API
+export const userInventoryApi = {
+  getMyInventory: async () => {
+    const response = await api.get('/user-inventory');
+    return response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/user-inventory/${id}`);
+    return response.data;
+  },
+  addManualItem: async (name: string, quantity: number, notes?: string) => {
+    const response = await api.post('/user-inventory', { name, quantity, notes });
+    return response.data;
+  },
+  updateItem: async (id: string, name: string, quantity: number, notes?: string) => {
+    const response = await api.put(`/user-inventory/${id}`, { name, quantity, notes });
+    return response.data;
+  },
+  deleteItem: async (id: string) => {
+    const response = await api.delete(`/user-inventory/${id}`);
+    return response.data;
+  },
+};
+
+// User Management API
+export const userApi = {
+  getAllUsers: async () => {
+    const response = await api.get('/users');
+    return response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get(`/users/${id}`);
+    return response.data;
+  },
+  createUser: async (user: {
+    username: string;
+    password: string;
+    email?: string;
+    role: string;
+  }) => {
+    const response = await api.post('/users', user);
+    return response.data;
+  },
+  updateUser: async (id: string, user: {
+    username?: string;
+    password?: string;
+    email?: string;
+    role?: string;
+  }) => {
+    const response = await api.put(`/users/${id}`, user);
+    return response.data;
+  },
+  enableUser: async (id: string) => {
+    const response = await api.patch(`/users/${id}/enable`);
+    return response.data;
+  },
+  disableUser: async (id: string) => {
+    const response = await api.patch(`/users/${id}/disable`);
     return response.data;
   },
 };
