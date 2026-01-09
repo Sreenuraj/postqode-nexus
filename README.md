@@ -21,16 +21,27 @@ This is a **long-living demo asset** for:
 
 | Role | Capabilities |
 |------|-------------|
-| **Admin** | Full product & inventory control, dashboard access, analytics |
-| **User** | View-only catalog, search, sort, filter |
+| **Admin** | Full product & inventory control, dashboard access, analytics, category management, user management, order approval/rejection |
+| **User** | Browse catalog, filter by category, place orders, manage personal inventory, view order history |
 
 ## 🖥️ Screens
 
+### Admin Screens
+1. **Dashboard** — Real-time analytics and metrics
+2. **Product Catalog** — Full CRUD, category assignment
+3. **Inventory Management** — Stock control, status updates
+4. **Categories** — Create, edit, delete product categories
+5. **Users** — Create, edit, enable/disable users
+6. **Order Management** — Approve/Reject pending orders
+
+### User Screens
+1. **Product Catalog** — Browse, search, filter by category, place orders
+2. **My Orders** — View order history, cancel pending orders
+3. **My Inventory** — Personal inventory (auto-created from orders + manual items)
+
+### Common Screens
 1. **Login** — Role-based authentication
-2. **Product Catalog** — Search, sort, filter, pagination
-3. **Inventory Management** — Add, update, delete products (Admin)
-4. **Dashboard** — Real-time analytics (Admin)
-5. **Logout** — Session termination
+2. **Logout** — Session termination
 
 ## 🛠️ Technology Stack
 

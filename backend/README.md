@@ -34,22 +34,33 @@ backend/
 │   ├── controller/
 │   │   ├── AuthController.java    # Login, logout, /me
 │   │   ├── ProductController.java # Product CRUD
+│   │   ├── CategoryController.java# Category CRUD (Admin)
+│   │   ├── UserController.java    # User Management (Admin)
+│   │   ├── OrderController.java   # Order Management
+│   │   ├── UserInventoryController.java # User Inventory
 │   │   └── GraphQLController.java # GraphQL resolvers
 │   ├── dto/
 │   │   ├── AuthResponse.java
 │   │   ├── LoginRequest.java
 │   │   ├── ProductRequest.java
 │   │   ├── ProductResponse.java
+│   │   ├── UserRequest.java
 │   │   ├── UserResponse.java
 │   │   └── graphql/               # GraphQL DTOs
 │   ├── model/
 │   │   ├── User.java
 │   │   ├── Product.java
+│   │   ├── Category.java
+│   │   ├── Order.java
+│   │   ├── UserInventory.java
 │   │   ├── ActivityLog.java
-│   │   └── enums (UserRole, ProductStatus, ActionType)
+│   │   └── enums (UserRole, ProductStatus, OrderStatus, InventorySource)
 │   ├── repository/
 │   │   ├── UserRepository.java
 │   │   ├── ProductRepository.java
+│   │   ├── CategoryRepository.java
+│   │   ├── OrderRepository.java
+│   │   ├── UserInventoryRepository.java
 │   │   └── ActivityLogRepository.java
 │   ├── security/
 │   │   ├── JwtTokenProvider.java
@@ -58,10 +69,14 @@ backend/
 │   └── service/
 │       ├── AuthService.java
 │       ├── ProductService.java
+│       ├── CategoryService.java
+│       ├── UserService.java
+│       ├── OrderService.java
+│       ├── UserInventoryService.java
 │       └── DashboardService.java
 ├── src/main/resources/
 │   ├── application.yml            # Configuration
-│   ├── db/migration/              # Flyway migrations
+│   ├── db/migration/              # Flyway migrations (V1-V5)
 │   └── graphql/schema.graphqls    # GraphQL schema
 ├── src/test/java/                 # Tests
 ├── pom.xml                        # Dependencies
@@ -82,12 +97,51 @@ backend/
 ### Products
 | Method | Endpoint | Description | Role |
 |--------|----------|-------------|------|
-| GET | `/api/v1/products` | List products | Any |
+| GET | `/api/v1/products` | List products (filter by category) | Any |
 | GET | `/api/v1/products/{id}` | Get product | Any |
 | POST | `/api/v1/products` | Create product | Admin |
 | PUT | `/api/v1/products/{id}` | Update product | Admin |
 | DELETE | `/api/v1/products/{id}` | Delete product | Admin |
 | PATCH | `/api/v1/products/{id}/status` | Update status | Admin |
+
+### Categories
+| Method | Endpoint | Description | Role |
+|--------|----------|-------------|------|
+| GET | `/api/v1/categories` | List all categories | Any |
+| GET | `/api/v1/categories/{id}` | Get category by ID | Any |
+| POST | `/api/v1/categories` | Create category | Admin |
+| PUT | `/api/v1/categories/{id}` | Update category | Admin |
+| DELETE | `/api/v1/categories/{id}` | Delete category | Admin |
+
+### Users (Admin)
+| Method | Endpoint | Description | Role |
+|--------|----------|-------------|------|
+| GET | `/api/v1/users` | List all users | Admin |
+| GET | `/api/v1/users/{id}` | Get user by ID | Admin |
+| POST | `/api/v1/users` | Create user | Admin |
+| PUT | `/api/v1/users/{id}` | Update user | Admin |
+| PATCH | `/api/v1/users/{id}/enable` | Enable user | Admin |
+| PATCH | `/api/v1/users/{id}/disable` | Disable user | Admin |
+
+### Orders
+| Method | Endpoint | Description | Role |
+|--------|----------|-------------|------|
+| GET | `/api/v1/orders` | List all orders | Admin |
+| GET | `/api/v1/orders/my-orders` | Current user's orders | User |
+| GET | `/api/v1/orders/{id}` | Get order by ID | Any |
+| POST | `/api/v1/orders` | Place order | User |
+| POST | `/api/v1/orders/{id}/approve` | Approve order | Admin |
+| POST | `/api/v1/orders/{id}/reject` | Reject order | Admin |
+| POST | `/api/v1/orders/{id}/cancel` | Cancel order (PENDING only) | User |
+
+### User Inventory
+| Method | Endpoint | Description | Role |
+|--------|----------|-------------|------|
+| GET | `/api/v1/user-inventory` | Current user's inventory | User |
+| GET | `/api/v1/user-inventory/{id}` | Get inventory item | User |
+| POST | `/api/v1/user-inventory` | Add manual item | User |
+| PUT | `/api/v1/user-inventory/{id}` | Update item (MANUAL only) | User |
+| DELETE | `/api/v1/user-inventory/{id}` | Delete item (MANUAL only) | User |
 
 ### GraphQL
 | Endpoint | Description |
@@ -172,6 +226,11 @@ mvn package -DskipTests
 | `AuthControllerIT.java` | Controller integration |
 | `ProductControllerIT.java` | Controller integration |
 | `GraphQLControllerTest.java` | GraphQL tests |
+| `CategoryServiceTest.java` | Service unit test |
+| `OrderServiceTest.java` | Service unit test |
+| `UserInventoryServiceTest.java` | Service unit test |
+| `UserServiceTest.java` | Service integration test |
+| `ProductServiceTest.java` | Service unit test |
 | `DashboardServiceTest.java` | Service unit test |
 
 ---
