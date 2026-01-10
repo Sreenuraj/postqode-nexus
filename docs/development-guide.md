@@ -106,7 +106,7 @@ cd backend && ./mvnw spring-boot:run
 | Backend Health | http://localhost:8080/actuator/health |
 | Swagger UI | http://localhost:8080/swagger-ui.html |
 | GraphiQL | http://localhost:8080/graphiql |
-| Raw Schema | http://localhost:8080/graphql/schema |
+| Raw Schema | http://localhost:8080/graphql-schema |
 | Frontend | http://localhost:5173 |
 | Database | localhost:5432 |
 

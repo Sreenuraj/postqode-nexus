@@ -50,7 +50,7 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
-                                "/graphql/schema",
+                                "/graphql-schema",
                                 "/graphiql",
                                 "/vendor/**",
                                 "/webjars/**")

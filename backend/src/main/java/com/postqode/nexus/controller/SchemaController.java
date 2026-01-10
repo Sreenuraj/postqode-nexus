@@ -16,11 +16,10 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
 @RestController
-@RequestMapping("/graphql")
 @RequiredArgsConstructor
 public class SchemaController {
 
-    @GetMapping(value = "/schema", produces = MediaType.TEXT_PLAIN_VALUE)
+    @GetMapping(value = "/graphql-schema", produces = MediaType.TEXT_PLAIN_VALUE)
     public ResponseEntity<String> getSchema() {
         try {
             Resource resource = new ClassPathResource("graphql/schema.graphqls");

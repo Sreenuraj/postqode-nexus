@@ -454,7 +454,7 @@ postqode-nexus/
 ### Phase 3.2: GraphQL Enhancements (Week 7)
 | Task | Description | Deliverables | Status |
 |------|-------------|--------------|--------|
-| ✅ 3.2.1 | Schema Endpoint | Expose raw schema at `/graphql/schema` | Complete |
+| ✅ 3.2.1 | Schema Endpoint | Expose raw schema at `/graphql-schema` | Complete |
 | ❌ 3.2.2 | Schema Visualization | Integrate GraphQL Voyager (Dependency Issues) | Skipped |
 | ✅ 3.2.3 | Update Documentation | Add new endpoints to docs and scripts | Complete |
 
