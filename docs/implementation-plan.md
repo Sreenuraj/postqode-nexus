@@ -449,6 +449,7 @@ postqode-nexus/
 | ✅ 3.1.6 | Product Catalog Refactor | Categorized view, Order integration | Complete |
 | ✅ 3.1.7 | Inventory Enhancements | Merge duplicate purchases, Consume items | Complete |
 | ✅ 3.1.8 | Session Stability | Extend JWT expiry to 7 days | Complete |
+| ✅ 3.1.9 | Dashboard Refinements | Admin Order Overview, User Dashboard Stats | Complete |
 
 **Detailed Functional Specs:**
 
@@ -469,6 +470,11 @@ postqode-nexus/
 - **Components**: "My Inventory" Page, Add/Edit Item Modal.
 - **Integration**: Auto-add approved order items.
 - **Actions**: CRUD (Create, Read, Update, Delete).
+
+#### 3.1.9 Dashboard Refinements
+- **Admin**: Added "Order Overview" cards (Pending, Approved, Rejected).
+- **User**: Created personal dashboard with Order Stats and Inventory Count.
+- **Navigation**: Dashboard is now the landing page for all users.
 
 #### 🧪 Phase 3.1 Testing
 

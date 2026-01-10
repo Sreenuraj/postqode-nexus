@@ -12,16 +12,16 @@ import {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 import { Separator } from './ui/separator';
-import { 
-  Package, 
-  LayoutDashboard, 
-  LogOut, 
-  User, 
-  Tag, 
-  Users, 
-  ShoppingCart, 
+import {
+  Package,
+  LayoutDashboard,
+  LogOut,
+  User,
+  Tag,
+  Users,
+  ShoppingCart,
   ClipboardList,
-  Box 
+  Box
 } from 'lucide-react';
 
 export const Layout: React.FC = () => {
@@ -37,13 +37,13 @@ export const Layout: React.FC = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navItems = [
+    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, show: true },
     { path: '/products', label: 'Products', icon: Package, show: true },
     { path: '/categories', label: 'Categories', icon: Tag, show: isAdmin },
     { path: '/users', label: 'Users', icon: Users, show: isAdmin },
     { path: '/orders', label: 'Order Management', icon: ClipboardList, show: isAdmin },
     { path: '/my-orders', label: 'My Orders', icon: ShoppingCart, show: !isAdmin },
     { path: '/my-inventory', label: 'My Inventory', icon: Box, show: !isAdmin },
-    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, show: isAdmin },
   ];
 
   return (
@@ -52,7 +52,7 @@ export const Layout: React.FC = () => {
       <header className="sticky top-0 z-50 w-full border-b bg-white dark:bg-slate-950">
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-6">
-            <Link to="/products" className="flex items-center gap-2">
+            <Link to="/dashboard" className="flex items-center gap-2">
               <Package className="h-6 w-6" />
               <span className="font-bold text-xl">POSTQODE NEXUS</span>
             </Link>

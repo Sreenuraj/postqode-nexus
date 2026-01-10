@@ -35,9 +35,10 @@ This is a **long-living demo asset** for:
 6. **Order Management** — Approve/Reject pending orders
 
 ### User Screens
-1. **Product Catalog** — Browse, search, filter by category, place orders
-2. **My Orders** — View order history, cancel pending orders
-3. **My Inventory** — Personal inventory (auto-created from orders, merge duplicates, consume items)
+1. **Dashboard** — Personal overview (My Orders, Inventory Stats)
+2. **Product Catalog** — Browse, search, filter by category, place orders
+3. **My Orders** — View order history, cancel pending orders
+4. **My Inventory** — Personal inventory (auto-created from orders, merge duplicates, consume items)
 
 ### Common Screens
 1. **Login** — Role-based authentication

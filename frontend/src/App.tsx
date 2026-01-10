@@ -29,7 +29,7 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Navigate to="/products" replace />} />
+            <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="products" element={<ProductCatalogPage />} />
             <Route
               path="categories"
@@ -74,7 +74,7 @@ function App() {
             <Route
               path="dashboard"
               element={
-                <ProtectedRoute requireAdmin>
+                <ProtectedRoute>
                   <DashboardPage />
                 </ProtectedRoute>
               }
@@ -82,7 +82,7 @@ function App() {
           </Route>
 
           {/* Catch all */}
-          <Route path="*" element={<Navigate to="/products" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
 
         {/* Toast Notifications */}

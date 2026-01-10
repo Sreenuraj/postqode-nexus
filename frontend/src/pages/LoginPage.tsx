@@ -46,7 +46,7 @@ export const LoginPage: React.FC = () => {
     setLoading(true);
     try {
       await login(username, password);
-      navigate('/products');
+      navigate('/dashboard');
     } catch (error) {
       // Error is handled in AuthContext with toast
     } finally {

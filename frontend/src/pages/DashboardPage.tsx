@@ -1,34 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { dashboardApi, DashboardMetrics, StatusCount, UserActivity, ActivityLog } from '../services/graphql';
+import { orderApi, userInventoryApi } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Skeleton } from '../components/ui/skeleton';
 import { Badge } from '../components/ui/badge';
-import { RefreshCw, Package, CheckCircle, AlertCircle, XCircle, TrendingUp } from 'lucide-react';
+import { RefreshCw, Package, CheckCircle, AlertCircle, XCircle, TrendingUp, ShoppingCart, Clock, DollarSign, Box } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+interface AdminOrderStats {
+  pending: number;
+  approved: number;
+  rejected: number;
+  total: number;
+}
+
+interface UserStats {
+  pendingOrders: number;
+  totalOrders: number;
+  totalSpend: number;
+  inventoryItems: number;
+  inventoryQuantity: number;
+}
+
 export const DashboardPage: React.FC = () => {
+  const { user, isAdmin } = useAuth();
+  const [loading, setLoading] = useState(true);
+
+  // Admin State
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [statusData, setStatusData] = useState<StatusCount[]>([]);
   const [userActivity, setUserActivity] = useState<UserActivity[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [adminOrderStats, setAdminOrderStats] = useState<AdminOrderStats | null>(null);
+
+  // User State
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
 
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [metricsData, statusCounts, activityByUser, recentLogs] = await Promise.all([
-        dashboardApi.getDashboardMetrics(),
-        dashboardApi.getProductsByStatus(),
-        dashboardApi.getActivityByUser(7),
-        dashboardApi.getRecentActivity(10),
-      ]);
-
-      setMetrics(metricsData);
-      setStatusData(statusCounts);
-      setUserActivity(activityByUser);
-      setRecentActivity(recentLogs);
+      if (isAdmin) {
+        await fetchAdminData();
+      } else {
+        await fetchUserData();
+      }
     } catch (error) {
       toast.error('Failed to load dashboard data');
       console.error('Dashboard error:', error);
@@ -37,9 +55,59 @@ export const DashboardPage: React.FC = () => {
     }
   };
 
+  const fetchAdminData = async () => {
+    const [metricsData, statusCounts, activityByUser, recentLogs, orders] = await Promise.all([
+      dashboardApi.getDashboardMetrics(),
+      dashboardApi.getProductsByStatus(),
+      dashboardApi.getActivityByUser(7),
+      dashboardApi.getRecentActivity(10),
+      orderApi.getAllOrders(),
+    ]);
+
+    setMetrics(metricsData);
+    setStatusData(statusCounts);
+    setUserActivity(activityByUser);
+    setRecentActivity(recentLogs);
+
+    // Calculate admin order stats
+    const stats = orders.reduce(
+      (acc: AdminOrderStats, order: any) => {
+        acc.total++;
+        if (order.status === 'PENDING') acc.pending++;
+        else if (order.status === 'APPROVED') acc.approved++;
+        else if (order.status === 'REJECTED') acc.rejected++;
+        return acc;
+      },
+      { pending: 0, approved: 0, rejected: 0, total: 0 }
+    );
+    setAdminOrderStats(stats);
+  };
+
+  const fetchUserData = async () => {
+    const [myOrders, myInventory] = await Promise.all([
+      orderApi.getMyOrders(),
+      userInventoryApi.getMyInventory(),
+    ]);
+
+    const pendingOrders = myOrders.filter((o: any) => o.status === 'PENDING').length;
+    const totalSpend = myOrders.reduce((sum: number, o: any) => {
+      return sum + (o.product?.price || 0) * o.quantity;
+    }, 0);
+
+    const inventoryQuantity = myInventory.reduce((sum: number, i: any) => sum + i.quantity, 0);
+
+    setUserStats({
+      pendingOrders,
+      totalOrders: myOrders.length,
+      totalSpend,
+      inventoryItems: myInventory.length,
+      inventoryQuantity,
+    });
+  };
+
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [isAdmin]);
 
   const COLORS = {
     ACTIVE: '#22c55e',
@@ -83,20 +151,9 @@ export const DashboardPage: React.FC = () => {
     }
   };
 
-  return (
+  const renderAdminDashboard = () => (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-slate-500 mt-1">Real-time inventory analytics and metrics</p>
-        </div>
-        <Button variant="outline" size="icon" onClick={fetchDashboardData}>
-          <RefreshCw className="h-4 w-4" />
-        </Button>
-      </div>
-
-      {/* Summary Cards */}
+      {/* Product Summary Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card id="dashboard-card-total">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -104,11 +161,7 @@ export const DashboardPage: React.FC = () => {
             <Package className="h-4 w-4 text-slate-500" />
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="text-2xl font-bold">{metrics?.totalProducts || 0}</div>
-            )}
+            {loading ? <Skeleton className="h-8 w-20" /> : <div className="text-2xl font-bold">{metrics?.totalProducts || 0}</div>}
           </CardContent>
         </Card>
 
@@ -118,11 +171,7 @@ export const DashboardPage: React.FC = () => {
             <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="text-2xl font-bold text-green-600">{metrics?.activeProducts || 0}</div>
-            )}
+            {loading ? <Skeleton className="h-8 w-20" /> : <div className="text-2xl font-bold text-green-600">{metrics?.activeProducts || 0}</div>}
           </CardContent>
         </Card>
 
@@ -132,11 +181,7 @@ export const DashboardPage: React.FC = () => {
             <AlertCircle className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="text-2xl font-bold text-yellow-600">{metrics?.lowStockProducts || 0}</div>
-            )}
+            {loading ? <Skeleton className="h-8 w-20" /> : <div className="text-2xl font-bold text-yellow-600">{metrics?.lowStockProducts || 0}</div>}
           </CardContent>
         </Card>
 
@@ -146,13 +191,52 @@ export const DashboardPage: React.FC = () => {
             <XCircle className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            {loading ? (
-              <Skeleton className="h-8 w-20" />
-            ) : (
-              <div className="text-2xl font-bold text-red-600">{metrics?.outOfStockProducts || 0}</div>
-            )}
+            {loading ? <Skeleton className="h-8 w-20" /> : <div className="text-2xl font-bold text-red-600">{metrics?.outOfStockProducts || 0}</div>}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Order Summary Cards */}
+      <div>
+        <h2 className="text-lg font-semibold mb-3">Order Overview</h2>
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-slate-500" />
+            </CardHeader>
+            <CardContent>
+              {loading ? <Skeleton className="h-8 w-20" /> : <div className="text-2xl font-bold">{adminOrderStats?.total || 0}</div>}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pending</CardTitle>
+              <Clock className="h-4 w-4 text-yellow-500" />
+            </CardHeader>
+            <CardContent>
+              {loading ? <Skeleton className="h-8 w-20" /> : <div className="text-2xl font-bold text-yellow-600">{adminOrderStats?.pending || 0}</div>}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Approved</CardTitle>
+              <CheckCircle className="h-4 w-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              {loading ? <Skeleton className="h-8 w-20" /> : <div className="text-2xl font-bold text-green-600">{adminOrderStats?.approved || 0}</div>}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Rejected</CardTitle>
+              <XCircle className="h-4 w-4 text-red-500" />
+            </CardHeader>
+            <CardContent>
+              {loading ? <Skeleton className="h-8 w-20" /> : <div className="text-2xl font-bold text-red-600">{adminOrderStats?.rejected || 0}</div>}
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Charts Row */}
@@ -273,6 +357,90 @@ export const DashboardPage: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+
+  const renderUserDashboard = () => (
+    <div className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">My Orders</CardTitle>
+            <ShoppingCart className="h-4 w-4 text-slate-500" />
+          </CardHeader>
+          <CardContent>
+            {loading ? <Skeleton className="h-8 w-20" /> : <div className="text-2xl font-bold">{userStats?.totalOrders || 0}</div>}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Orders</CardTitle>
+            <Clock className="h-4 w-4 text-yellow-500" />
+          </CardHeader>
+          <CardContent>
+            {loading ? <Skeleton className="h-8 w-20" /> : <div className="text-2xl font-bold text-yellow-600">{userStats?.pendingOrders || 0}</div>}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Spend</CardTitle>
+            <DollarSign className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            {loading ? <Skeleton className="h-8 w-20" /> : <div className="text-2xl font-bold text-green-600">${userStats?.totalSpend.toFixed(2) || '0.00'}</div>}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Inventory Items</CardTitle>
+            <Box className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            {loading ? <Skeleton className="h-8 w-20" /> : (
+              <div className="flex items-end gap-2">
+                <div className="text-2xl font-bold text-blue-600">{userStats?.inventoryItems || 0}</div>
+                <div className="text-sm text-slate-500 mb-1">({userStats?.inventoryQuantity || 0} units)</div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Welcome back, {user?.username}!</CardTitle>
+          <CardDescription>
+            This is your personal dashboard. Here you can track your orders and manage your inventory.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-4">
+            <Button onClick={() => window.location.href = '/my-orders'}>View My Orders</Button>
+            <Button variant="outline" onClick={() => window.location.href = '/my-inventory'}>Manage Inventory</Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <p className="text-slate-500 mt-1">
+            {isAdmin ? 'Real-time inventory analytics and metrics' : 'Your personal overview'}
+          </p>
+        </div>
+        <Button variant="outline" size="icon" onClick={fetchDashboardData}>
+          <RefreshCw className="h-4 w-4" />
+        </Button>
+      </div>
+
+      {isAdmin ? renderAdminDashboard() : renderUserDashboard()}
     </div>
   );
 };

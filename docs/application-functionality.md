@@ -608,6 +608,15 @@ Same layout as Add Product, pre-filled with existing data.
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
+#### Order Overview (Admin)
+
+| Metric | Description |
+|--------|-------------|
+| Total Orders | Total number of orders placed |
+| Pending | Orders awaiting approval |
+| Approved | Completed orders |
+| Rejected | Rejected orders |
+
 #### Dashboard Components
 
 ---
@@ -1082,3 +1091,32 @@ Same layout as Add Product, pre-filled with existing data.
 ---
 
 *Document maintained by PostQode Team*
+### 4.10 User Dashboard
+
+**Purpose**: Landing page for standard users showing personal stats.
+
+#### Layout
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│  Welcome back, User!                                                    │
+│                                                                         │
+│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌─────────┐│
+│  │ My Orders       │ │ Pending         │ │ Total Spend     │ │Inventory││
+│  │      12         │ │    2            │ │   $ 450.00      │ │   8     ││
+│  │  🛒             │ │  🕒             │ │  💲             │ │  📦     ││
+│  └─────────────────┘ └─────────────────┘ └─────────────────┘ └─────────┘│
+│                                                                         │
+│   [View My Orders]   [Manage Inventory]                                 │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Metrics
+
+| Metric | Description |
+|--------|-------------|
+| My Orders | Total count of orders placed by user |
+| Pending | Count of orders waiting for admin approval |
+| Total Spend | Sum of value of all approved orders |
+| Inventory Items | Count of unique items in personal inventory |
