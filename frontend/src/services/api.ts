@@ -61,7 +61,23 @@ export const productApi = {
     page?: number;
     pageSize?: number;
   }) => {
-    const response = await api.get('/products', { params });
+    const queryParams: any = { ...params };
+
+    // Transform sortBy and sortOrder to Spring Data sort format (field,direction)
+    if (queryParams.sortBy) {
+      const order = queryParams.sortOrder || 'ASC';
+      queryParams.sort = `${queryParams.sortBy},${order}`;
+      delete queryParams.sortBy;
+      delete queryParams.sortOrder;
+    }
+
+    // Map pageSize to size
+    if (queryParams.pageSize) {
+      queryParams.size = queryParams.pageSize;
+      delete queryParams.pageSize;
+    }
+
+    const response = await api.get('/products', { params: queryParams });
     return response.data;
   },
   getById: async (id: string) => {

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, beforeAll } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ProductCatalogPage } from '../ProductCatalogPage';
@@ -12,6 +12,12 @@ vi.mock('../../services/api', () => ({
     create: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
+  },
+  categoryApi: {
+    getAll: vi.fn().mockResolvedValue([]),
+  },
+  orderApi: {
+    createOrder: vi.fn(),
   },
 }));
 
@@ -90,6 +96,18 @@ const renderProductCatalog = () => {
 };
 
 describe('ProductCatalogPage', () => {
+  beforeAll(() => {
+    Object.defineProperty(window, 'localStorage', {
+      value: {
+        getItem: vi.fn(),
+        setItem: vi.fn(),
+        removeItem: vi.fn(),
+        clear: vi.fn(),
+      },
+      writable: true,
+    });
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
     const mockGetAll = vi.mocked(productApi.getAll);
