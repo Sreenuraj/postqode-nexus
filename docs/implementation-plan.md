@@ -451,6 +451,13 @@ postqode-nexus/
 | ✅ 3.1.8 | Session Stability | Extend JWT expiry to 7 days | Complete |
 | ✅ 3.1.9 | Dashboard Refinements | Admin Order Overview, User Dashboard Stats | Complete |
 
+### Phase 3.2: GraphQL Enhancements (Week 7)
+| Task | Description | Deliverables | Status |
+|------|-------------|--------------|--------|
+| ✅ 3.2.1 | Schema Endpoint | Expose raw schema at `/graphql/schema` | Complete |
+| ❌ 3.2.2 | Schema Visualization | Integrate GraphQL Voyager (Dependency Issues) | Skipped |
+| ✅ 3.2.3 | Update Documentation | Add new endpoints to docs and scripts | Complete |
+
 **Detailed Functional Specs:**
 
 #### 3.1.1 Category Management

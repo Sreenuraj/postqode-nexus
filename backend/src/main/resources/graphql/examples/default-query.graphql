@@ -1,0 +1,36 @@
+# 📊 Welcome to PostQode Nexus GraphQL API!
+# Hit the "Play" button to execute this query.
+
+query DashboardOverview {
+  # 1. Fetch Dashboard Metrics
+  dashboardMetrics {
+    totalProducts
+    activeProducts
+    lowStockProducts
+    outOfStockProducts
+    productsAddedToday
+  }
+  
+  # 2. See Products Added Today
+  productsAddedToday
+  
+  # 3. Get Recent Activity Log
+  recentActivity(limit: 5) {
+    username
+    actionType
+    productName
+    createdAt
+  }
+  
+  # 4. Fetch Products (Catalog)
+  products(page: 0, pageSize: 5) {
+    totalCount
+    items {
+      name
+      sku
+      status
+      price
+      quantity
+    }
+  }
+}

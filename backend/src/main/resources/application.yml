@@ -70,6 +70,13 @@ graphql:
   playground:
     mapping: /graphiql
     enabled: true
+    settings:
+      editor.theme: dark
+    tabs:
+      - name: "Dashboard & Catalog"
+        query: classpath:graphql/examples/default-query.graphql
+  
+
 
 logging:
   level:
