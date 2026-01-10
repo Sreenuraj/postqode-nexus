@@ -103,9 +103,9 @@ cd backend && ./mvnw spring-boot:run
 
 | Service | URL |
 |---------|-----|
-| Backend API | http://localhost:8080 |
+| Backend Health | http://localhost:8080/actuator/health |
 | Swagger UI | http://localhost:8080/swagger-ui.html |
-| GraphQL | http://localhost:8080/graphql |
+| GraphiQL | http://localhost:8080/graphiql |
 | Frontend | http://localhost:5173 |
 | Database | localhost:5432 |
 
@@ -149,7 +149,7 @@ docker-compose up -d --build
 
 | Service | URL |
 |---------|-----|
-| Backend API | http://localhost:8080 |
+| Backend Health | http://localhost:8080/actuator/health |
 | Swagger UI | http://localhost:8080/swagger-ui.html |
 | Frontend | http://localhost:3000 |
 | Database | localhost:5432 |
