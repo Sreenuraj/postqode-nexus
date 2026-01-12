@@ -528,6 +528,7 @@ postqode-nexus/
 | 4.9 | Mobile: Orders & Inventory | User mobile features | [My Inventory](./application-functionality.md#49-my-inventory-user) | ✅ |
 | 4.10 | Mobile: Order Management | Admin Order Approval | [Order Management](./application-functionality.md#48-order-management) | ✅ |
 | 4.11 | Mobile: Real Data Integration | GraphQL & REST Integration | – | ✅ |
+| 4.12 | Mobile: Integration Tests | Real Backend Tests | – | ✅ |
 
 **Mobile-Specific References:**
 - **Breakpoints**: [Breakpoints](./application-functionality.md#101-breakpoints)
@@ -540,6 +541,7 @@ postqode-nexus/
 | Unit | Component tests | `cd mobile && npm run test` | ✅ |
 | Unit | Navigation tests | `npm run test -- Navigation` | ✅ |
 | Integration | API integration | `npm run test:integration` | ✅ |
+| Integration | Real Backend Flow | `./scripts/test-mobile-integration.sh` | ✅ |
 | Unit | Screen tests | `npm run test -- screens` | ✅ |
 | E2E (Android) | Full flow | `npx detox test -c android.emu.debug` | ⏳ |
 | E2E (iOS) | Full flow | `npx detox test -c ios.sim.debug` | ⏳ |

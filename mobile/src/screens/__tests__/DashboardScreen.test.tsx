@@ -4,6 +4,15 @@ import DashboardScreen from '../DashboardScreen';
 import { dashboardApi } from '../../services/graphql';
 
 jest.mock('../../services/graphql');
+jest.mock('@react-navigation/native', () => {
+  const React = require('react');
+  return {
+    useNavigation: () => ({
+      navigate: jest.fn(),
+    }),
+    useFocusEffect: (callback: any) => React.useEffect(callback, []),
+  };
+});
 
 describe('DashboardScreen', () => {
   beforeEach(() => {

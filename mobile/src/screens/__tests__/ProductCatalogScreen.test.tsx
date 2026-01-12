@@ -7,6 +7,12 @@ import { useAuthStore } from '../../store/authStore';
 // Mock services
 jest.mock('../../services/product');
 jest.mock('../../store/authStore');
+jest.mock('@react-navigation/native', () => ({
+  useNavigation: () => ({
+    navigate: jest.fn(),
+  }),
+  useFocusEffect: jest.fn(),
+}));
 
 const mockProducts = [
   { id: '1', name: 'Product 1', price: 10, quantity: 5, status: 'ACTIVE', sku: 'PRD-001' },
@@ -26,20 +32,28 @@ describe('ProductCatalogScreen', () => {
   });
 
   it('renders products correctly', async () => {
+    jest.useFakeTimers();
     const { getByText } = render(<ProductCatalogScreen />);
+    
+    jest.advanceTimersByTime(500);
 
     await waitFor(() => {
       expect(getByText('Product 1')).toBeTruthy();
       expect(getByText('Product 2')).toBeTruthy();
     });
+    jest.useRealTimers();
   });
 
   it('shows buy button for user', async () => {
+    jest.useFakeTimers();
     const { getAllByText } = render(<ProductCatalogScreen />);
+    
+    jest.advanceTimersByTime(500);
 
     await waitFor(() => {
       expect(getAllByText('Buy')).toBeTruthy();
     });
+    jest.useRealTimers();
   });
 
   it('shows edit/delete buttons for admin', async () => {
