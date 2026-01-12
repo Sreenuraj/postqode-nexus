@@ -23,9 +23,20 @@ else
     echo "   No .env backup found (no changes to revert)"
 fi
 
-# 2. Stop Metro Bundler (Port 8081)
+# 2. Stop Metro Bundler (Port 8081) - Only kill node processes, not Docker
 echo "📱 Stopping Metro Bundler..."
-lsof -ti:8081 | xargs kill 2>/dev/null || echo -e "${YELLOW}   Not running${NC}"
+pkill -f "metro" 2>/dev/null || true
+METRO_KILLED=false
+for pid in $(lsof -ti:8081 2>/dev/null); do
+    # Check if this is a node process before killing
+    if ps -p $pid -o comm= 2>/dev/null | grep -qE "^node"; then
+        kill $pid 2>/dev/null || true
+        METRO_KILLED=true
+    fi
+done
+if [ "$METRO_KILLED" = false ]; then
+    echo -e "${YELLOW}   Metro Bundler not running or already stopped${NC}"
+fi
 
 echo -e "${GREEN}✅ Mobile services stopped${NC}"
 echo ""

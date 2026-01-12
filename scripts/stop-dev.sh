@@ -17,16 +17,32 @@ if [ -f "$PROJECT_ROOT/.env" ]; then
     export $(grep -v '^#' "$PROJECT_ROOT/.env" | xargs)
 fi
 
-# Stop backend
+# Stop backend - Only kill Java/Maven processes, not Docker
 echo "☕ Stopping Backend..."
-pkill -f "spring-boot:run" 2>/dev/null || echo -e "${YELLOW}   Not running${NC}"
-lsof -ti:${BACKEND_PORT:-8080} | xargs kill 2>/dev/null || true
+pkill -f "spring-boot:run" 2>/dev/null || true
+pkill -f "maven.*spring-boot" 2>/dev/null || true
+# Only kill java processes on the backend port, not Docker processes
+BACKEND_PORT_VAL=${BACKEND_PORT:-8080}
+for pid in $(lsof -ti:$BACKEND_PORT_VAL 2>/dev/null); do
+    # Check if this is a java process before killing
+    if ps -p $pid -o comm= 2>/dev/null | grep -qE "^(java|mvn)"; then
+        kill $pid 2>/dev/null || true
+    fi
+done
 echo -e "${GREEN}   ✅ Backend stopped${NC}"
 
-# Stop frontend
+# Stop frontend - Only kill Node/Vite processes, not Docker
 echo "⚛️  Stopping Frontend..."
-pkill -f "vite" 2>/dev/null || echo -e "${YELLOW}   Not running${NC}"
-lsof -ti:${FRONTEND_PORT:-3000} | xargs kill 2>/dev/null || true
+pkill -f "vite" 2>/dev/null || true
+pkill -f "node.*vite" 2>/dev/null || true
+# Only kill node processes on the frontend port, not Docker processes
+FRONTEND_PORT_VAL=${FRONTEND_PORT:-3000}
+for pid in $(lsof -ti:$FRONTEND_PORT_VAL 2>/dev/null); do
+    # Check if this is a node process before killing
+    if ps -p $pid -o comm= 2>/dev/null | grep -qE "^node"; then
+        kill $pid 2>/dev/null || true
+    fi
+done
 echo -e "${GREEN}   ✅ Frontend stopped${NC}"
 
 # Stop database
