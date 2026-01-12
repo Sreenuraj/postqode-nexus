@@ -64,7 +64,7 @@ postqode-nexus/
 │   └── application-functionality.md
 ├── backend/                 # Java Spring Boot
 ├── frontend/                # React Web App
-├── mobile/                  # React Native App (Coming in Phase 4)
+├── mobile/                  # React Native App
 ├── database/                # Migrations & Seeds
 ├── docker/                  # Docker Compose files
 └── automation/              # Test automation (Coming in Phase 6)
@@ -81,6 +81,9 @@ postqode-nexus/
 ```bash
 # Start Development Environment (Backend + Frontend + DB)
 ./scripts/start-dev.sh
+
+# Start Mobile App
+./scripts/start-mobile.sh
 
 # Or using Docker Compose
 docker-compose up -d

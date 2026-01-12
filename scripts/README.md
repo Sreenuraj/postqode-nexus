@@ -27,6 +27,8 @@ Quick reference for all available scripts.
 | `start-all.sh` | Start via Docker Compose |
 | `start-backend.sh` | Start backend only |
 | `start-frontend.sh` | Start frontend only |
+| `start-mobile.sh` | Start mobile app (Metro Bundler) |
+| `stop-mobile.sh` | Stop mobile services |
 | `reset-demo.sh` | Reset demo data |
 
 ---
@@ -157,6 +159,47 @@ Start just the Vite development server.
 
 ```bash
 ./scripts/start-frontend.sh
+```
+
+---
+
+### `start-mobile.sh` - Start Mobile App
+
+Interactive script to start the mobile development environment.
+
+```bash
+./scripts/start-mobile.sh
+```
+
+**Features:**
+- Checks if Backend is running (starts it if needed)
+- Asks for Platform (Android/iOS) and Device (Simulator/Physical)
+- **Simulators:** Automatically builds and installs the app (Debug build)
+- **Physical Devices:** Configures IP address and starts Metro Bundler for Expo Go
+
+---
+
+### `build-mobile-android.sh` & `build-mobile-ios.sh`
+
+Scripts to manually build the native app binaries (APK/APP).
+
+```bash
+./scripts/build-mobile-android.sh  # Generates APK in mobile/android/...
+./scripts/build-mobile-ios.sh      # Generates APP in mobile/ios/...
+```
+
+**When to use:**
+- Use these if you want to generate the binary file without running it immediately.
+- `start-mobile.sh` handles building automatically for Simulators/Emulators.
+
+---
+
+### `stop-mobile.sh` - Stop Mobile Services
+
+Stop the Metro Bundler.
+
+```bash
+./scripts/stop-mobile.sh
 ```
 
 ---
