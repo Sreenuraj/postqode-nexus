@@ -29,6 +29,7 @@ Quick reference for all available scripts.
 | `start-frontend.sh` | Start frontend only |
 | `start-mobile.sh` | Start mobile app (Metro Bundler) |
 | `stop-mobile.sh` | Stop mobile services |
+| `test-mobile-integration.sh` | Run mobile integration tests with real backend |
 | `reset-demo.sh` | Reset demo data |
 
 ---
@@ -201,6 +202,23 @@ Stop the Metro Bundler.
 ```bash
 ./scripts/stop-mobile.sh
 ```
+
+---
+
+### `test-mobile-integration.sh` - Run Mobile Integration Tests
+
+Runs integration tests for the mobile app against a real backend instance.
+
+```bash
+./scripts/test-mobile-integration.sh
+```
+
+**What it does:**
+- Checks if backend is running (starts it if needed)
+- Starts database if needed
+- Runs `npm run test:integration` in `mobile/`
+- Stops backend if it was started by the script
+- Cleans up development services on exit
 
 ---
 

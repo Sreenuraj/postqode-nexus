@@ -5,6 +5,14 @@ set -e
 
 echo "🚀 Setting up Integration Test Environment..."
 
+# Ensure cleanup runs on exit
+cleanup() {
+    echo ""
+    echo "🧹 Cleaning up..."
+    ./scripts/stop-dev.sh
+}
+trap cleanup EXIT
+
 # Start database if not running
 if ! docker ps | grep -q nexus-db; then
     echo "🐘 Starting Database..."
@@ -62,12 +70,5 @@ npm run test:integration
 TEST_EXIT_CODE=$?
 cd ..
 
-# Cleanup
-if [ "$BACKEND_ALREADY_RUNNING" != "true" ]; then
-    echo "🛑 Stopping Backend..."
-    kill $BACKEND_PID || true
-    # Also kill any java processes started by maven if needed
-    pkill -P $BACKEND_PID || true
-fi
-
+# Cleanup is handled by trap
 exit $TEST_EXIT_CODE
