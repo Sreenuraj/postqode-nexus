@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { ShoppingCart, Clock, DollarSign, Box, LogOut } from 'lucide-react-native';
+import { ShoppingCart, Clock, DollarSign, Box } from 'lucide-react-native';
 import { getMyOrders, Order } from '../services/order';
 import { getMyInventory } from '../services/inventory';
 import { useAuthStore } from '../store/authStore';
@@ -19,7 +19,6 @@ interface UserStats {
 export default function UserDashboardScreen() {
   const navigation = useNavigation<any>();
   const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -140,21 +139,6 @@ export default function UserDashboardScreen() {
           </View>
         </View>
 
-        <View style={styles.actions}>
-          <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={() => navigation.navigate('MyOrders')}
-          >
-            <Text style={styles.actionButtonText}>View My Orders</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.secondaryButton]}
-            onPress={() => navigation.navigate('MyInventory')}
-          >
-            <Text style={styles.secondaryButtonText}>Manage Inventory</Text>
-          </TouchableOpacity>
-        </View>
-
         {/* Recent Orders */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Recent Orders</Text>
@@ -181,12 +165,6 @@ export default function UserDashboardScreen() {
             <Text style={styles.emptyText}>No orders yet</Text>
           )}
         </View>
-
-        {/* Logout Button */}
-        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
-          <LogOut size={20} color="#ef4444" />
-          <Text style={styles.logoutText}>Logout</Text>
-        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -341,21 +319,5 @@ const styles = StyleSheet.create({
     color: '#64748b',
     textAlign: 'center',
     marginTop: 8,
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fee2e2',
-    padding: 16,
-    borderRadius: 8,
-    marginTop: 32,
-    marginBottom: 32,
-    gap: 8,
-  },
-  logoutText: {
-    color: '#ef4444',
-    fontWeight: '600',
-    fontSize: 16,
   },
 });

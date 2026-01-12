@@ -4,15 +4,13 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ActivityIndicator, View, TouchableOpacity } from 'react-native';
-import { LayoutDashboard, ShoppingBag, User, Shield, LogOut } from 'lucide-react-native';
+import { LayoutDashboard, ShoppingBag, Users, Layers, LogOut, Box, Clock, ClipboardList } from 'lucide-react-native';
 
 import LoginScreen from './src/screens/LoginScreen';
 import ProductCatalogScreen from './src/screens/ProductCatalogScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
-import InventoryScreen from './src/screens/InventoryScreen';
 import CategoryScreen from './src/screens/CategoryScreen';
 import UsersScreen from './src/screens/UsersScreen';
-import AdminScreen from './src/screens/AdminScreen';
 import OrderManagementScreen from './src/screens/OrderManagementScreen';
 import UserDashboardScreen from './src/screens/UserDashboardScreen';
 import MyOrdersScreen from './src/screens/MyOrdersScreen';
@@ -21,29 +19,6 @@ import { useAuthStore } from './src/store/authStore';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-const AdminStack = createNativeStackNavigator();
-const UserStack = createNativeStackNavigator();
-
-function AdminNavigator() {
-  return (
-    <AdminStack.Navigator>
-      <AdminStack.Screen name="AdminDashboard" component={AdminScreen} options={{ headerShown: false }} />
-      <AdminStack.Screen name="Categories" component={CategoryScreen} options={{ headerShown: false }} />
-      <AdminStack.Screen name="Users" component={UsersScreen} options={{ headerShown: false }} />
-      <AdminStack.Screen name="Orders" component={OrderManagementScreen} options={{ headerShown: false }} />
-    </AdminStack.Navigator>
-  );
-}
-
-function UserNavigator() {
-  return (
-    <UserStack.Navigator>
-      <UserStack.Screen name="UserDashboard" component={UserDashboardScreen} options={{ headerShown: false }} />
-      <UserStack.Screen name="MyOrders" component={MyOrdersScreen} options={{ headerShown: false }} />
-      <UserStack.Screen name="MyInventory" component={MyInventoryScreen} options={{ headerShown: false }} />
-    </UserStack.Navigator>
-  );
-}
 
 function AppNavigator() {
   const { user, logout } = useAuthStore();
@@ -78,11 +53,24 @@ function AppNavigator() {
             }} 
           />
           <Tab.Screen 
-            name="Admin" 
-            component={AdminNavigator} 
+            name="Categories" 
+            component={CategoryScreen} 
             options={{ 
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => <Shield size={size} color={color} />
+              tabBarIcon: ({ color, size }) => <Layers size={size} color={color} />
+            }} 
+          />
+          <Tab.Screen 
+            name="Users" 
+            component={UsersScreen} 
+            options={{ 
+              tabBarIcon: ({ color, size }) => <Users size={size} color={color} />
+            }} 
+          />
+          <Tab.Screen 
+            name="Orders" 
+            component={OrderManagementScreen} 
+            options={{ 
+              tabBarIcon: ({ color, size }) => <ClipboardList size={size} color={color} />
             }} 
           />
         </>
@@ -90,9 +78,8 @@ function AppNavigator() {
         <>
           <Tab.Screen 
             name="Dashboard" 
-            component={UserNavigator} 
+            component={UserDashboardScreen} 
             options={{ 
-              headerShown: false,
               tabBarIcon: ({ color, size }) => <LayoutDashboard size={size} color={color} />
             }} 
           />
@@ -102,6 +89,20 @@ function AppNavigator() {
             options={{ 
               headerShown: false,
               tabBarIcon: ({ color, size }) => <ShoppingBag size={size} color={color} />
+            }} 
+          />
+          <Tab.Screen 
+            name="My Orders" 
+            component={MyOrdersScreen} 
+            options={{ 
+              tabBarIcon: ({ color, size }) => <Clock size={size} color={color} />
+            }} 
+          />
+          <Tab.Screen 
+            name="Inventory" 
+            component={MyInventoryScreen} 
+            options={{ 
+              tabBarIcon: ({ color, size }) => <Box size={size} color={color} />
             }} 
           />
         </>

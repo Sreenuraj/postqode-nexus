@@ -93,8 +93,6 @@ export default function DashboardScreen() {
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        <Text style={styles.title}>Dashboard</Text>
-        
         {/* Order Overview */}
         <Text style={styles.sectionTitle}>Order Overview</Text>
         <View style={styles.statsGrid}>
@@ -198,12 +196,6 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#0f172a',
-    marginBottom: 16,
   },
   card: {
     backgroundColor: '#fff',
