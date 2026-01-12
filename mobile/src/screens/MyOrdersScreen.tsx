@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getMyOrders, Order } from '../services/order';
+import { getMyOrders, cancelOrder, Order } from '../services/order';
 import { format } from 'date-fns';
+import { XCircle } from 'lucide-react-native';
 
 export default function MyOrdersScreen() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -22,6 +23,28 @@ export default function MyOrdersScreen() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCancel = (order: Order) => {
+    Alert.alert(
+      'Cancel Order',
+      'Are you sure you want to cancel this order?',
+      [
+        { text: 'No', style: 'cancel' },
+        {
+          text: 'Yes',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await cancelOrder(order.id);
+              loadOrders();
+            } catch (error: any) {
+              Alert.alert('Error', error.response?.data?.message || 'Failed to cancel order');
+            }
+          },
+        },
+      ]
+    );
   };
 
   const getStatusStyle = (status: string) => {
@@ -49,6 +72,12 @@ export default function MyOrdersScreen() {
           <Text style={styles.detailText}>Qty: {item.quantity}</Text>
           <Text style={styles.detailText}>Total: ${(item.product?.price * item.quantity).toFixed(2)}</Text>
         </View>
+        {item.status === 'PENDING' && (
+          <TouchableOpacity onPress={() => handleCancel(item)} style={styles.cancelButton}>
+            <XCircle size={16} color="#64748b" />
+            <Text style={styles.cancelText}>Cancel Order</Text>
+          </TouchableOpacity>
+        )}
       </View>
     );
   };
@@ -158,5 +187,20 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#64748b',
     fontSize: 16,
+  },
+  cancelButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#f1f5f9',
+    gap: 6,
+  },
+  cancelText: {
+    color: '#64748b',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });

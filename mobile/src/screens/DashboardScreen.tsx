@@ -1,35 +1,64 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, Dimensions, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PieChart } from 'react-native-chart-kit';
+import { dashboardApi, DashboardMetrics, StatusCount, ActivityLog } from '../services/graphql';
+import { useFocusEffect } from '@react-navigation/native';
+import { formatDistanceToNow } from 'date-fns';
 
 const screenWidth = Dimensions.get('window').width;
 
 export default function DashboardScreen() {
-  // Mock data for now, should fetch from API
-  const data = [
-    {
-      name: 'Active',
-      population: 15,
-      color: '#dcfce7',
+  const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [statusData, setStatusData] = useState<StatusCount[]>([]);
+  const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadData = async () => {
+    try {
+      const [metricsData, statusData, activityData] = await Promise.all([
+        dashboardApi.getDashboardMetrics(),
+        dashboardApi.getProductsByStatus(),
+        dashboardApi.getRecentActivity(),
+      ]);
+      setMetrics(metricsData);
+      setStatusData(statusData);
+      setRecentActivity(activityData);
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [])
+  );
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadData();
+  };
+
+  const getPieChartData = () => {
+    const colors: Record<string, string> = {
+      ACTIVE: '#dcfce7',
+      LOW_STOCK: '#fef9c3',
+      OUT_OF_STOCK: '#fee2e2',
+    };
+
+    return statusData.map((item) => ({
+      name: item.status.replace('_', ' '),
+      population: item.count,
+      color: colors[item.status] || '#f1f5f9',
       legendFontColor: '#7F7F7F',
-      legendFontSize: 15,
-    },
-    {
-      name: 'Low Stock',
-      population: 5,
-      color: '#fef9c3',
-      legendFontColor: '#7F7F7F',
-      legendFontSize: 15,
-    },
-    {
-      name: 'Out of Stock',
-      population: 2,
-      color: '#fee2e2',
-      legendFontColor: '#7F7F7F',
-      legendFontSize: 15,
-    },
-  ];
+      legendFontSize: 12,
+    }));
+  };
 
   const chartConfig = {
     backgroundGradientFrom: '#1E2923',
@@ -42,35 +71,89 @@ export default function DashboardScreen() {
     useShadowColorFromDataset: false,
   };
 
+  if (loading && !refreshing) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#0f172a" />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView 
+        contentContainerStyle={styles.content}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
         <Text style={styles.title}>Dashboard</Text>
         
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Product Status</Text>
-          <PieChart
-            data={data}
-            width={screenWidth - 64}
-            height={220}
-            chartConfig={chartConfig}
-            accessor={'population'}
-            backgroundColor={'transparent'}
-            paddingLeft={'15'}
-            center={[10, 0]}
-            absolute
-          />
+        {/* Summary Cards */}
+        <View style={styles.statsGrid}>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{metrics?.totalProducts || 0}</Text>
+            <Text style={styles.statLabel}>Total Products</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.statValue}>{metrics?.productsAddedToday || 0}</Text>
+            <Text style={styles.statLabel}>Added Today</Text>
+          </View>
         </View>
 
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>22</Text>
-            <Text style={styles.statLabel}>Total Products</Text>
+            <Text style={[styles.statValue, { color: '#16a34a' }]}>{metrics?.activeProducts || 0}</Text>
+            <Text style={styles.statLabel}>Active</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>5</Text>
+            <Text style={[styles.statValue, { color: '#ca8a04' }]}>{metrics?.lowStockProducts || 0}</Text>
             <Text style={styles.statLabel}>Low Stock</Text>
           </View>
+          <View style={styles.statCard}>
+            <Text style={[styles.statValue, { color: '#dc2626' }]}>{metrics?.outOfStockProducts || 0}</Text>
+            <Text style={styles.statLabel}>Out of Stock</Text>
+          </View>
+        </View>
+
+        {/* Pie Chart */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Product Status</Text>
+          {statusData.length > 0 ? (
+            <PieChart
+              data={getPieChartData()}
+              width={screenWidth - 64}
+              height={220}
+              chartConfig={chartConfig}
+              accessor={'population'}
+              backgroundColor={'transparent'}
+              paddingLeft={'15'}
+              center={[10, 0]}
+              absolute
+            />
+          ) : (
+            <Text style={styles.emptyText}>No data available</Text>
+          )}
+        </View>
+
+        {/* Recent Activity */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Recent Activity</Text>
+          {recentActivity.length > 0 ? (
+            recentActivity.map((log) => (
+              <View key={log.id} style={styles.activityItem}>
+                <View style={styles.activityHeader}>
+                  <Text style={styles.activityUser}>{log.username}</Text>
+                  <Text style={styles.activityTime}>
+                    {formatDistanceToNow(new Date(log.createdAt), { addSuffix: true })}
+                  </Text>
+                </View>
+                <Text style={styles.activityText}>
+                  {log.actionType.toLowerCase()} {log.productName ? `"${log.productName}"` : ''}
+                </Text>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.emptyText}>No recent activity</Text>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -81,6 +164,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8fafc',
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   content: {
     padding: 16,
@@ -110,7 +198,8 @@ const styles = StyleSheet.create({
   },
   statsGrid: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 12,
+    marginBottom: 16,
   },
   statCard: {
     flex: 1,
@@ -130,8 +219,35 @@ const styles = StyleSheet.create({
     color: '#0f172a',
   },
   statLabel: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#64748b',
     marginTop: 4,
+    textAlign: 'center',
+  },
+  emptyText: {
+    color: '#64748b',
+    textAlign: 'center',
+    padding: 16,
+  },
+  activityItem: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+    paddingVertical: 12,
+  },
+  activityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  activityUser: {
+    fontWeight: '600',
+    color: '#0f172a',
+  },
+  activityTime: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  activityText: {
+    color: '#334155',
   },
 });

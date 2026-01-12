@@ -1,8 +1,8 @@
 import api from './api';
-import { Product } from '../types';
+import { Product, Page, ProductParams } from '../types';
 
-export const getProducts = async (params?: any): Promise<Product[]> => {
-  const response = await api.get<Product[]>('/api/v1/products', { params });
+export const getProducts = async (params?: ProductParams): Promise<Page<Product>> => {
+  const response = await api.get<Page<Product>>('/api/v1/products', { params });
   return response.data;
 };
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import { Package, Users, Layers, LogOut } from 'lucide-react-native';
+import { Package, Users, Layers, LogOut, ShoppingBag } from 'lucide-react-native';
 import { useAuthStore } from '../store/authStore';
 
 export default function AdminScreen() {
@@ -27,6 +27,12 @@ export default function AdminScreen() {
       description: 'Manage users and roles',
       icon: <Users size={24} color="#0f172a" />,
       screen: 'Users',
+    },
+    {
+      title: 'Order Management',
+      description: 'Approve or reject orders',
+      icon: <ShoppingBag size={24} color="#0f172a" />,
+      screen: 'Orders',
     },
   ];
 

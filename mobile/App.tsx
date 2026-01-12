@@ -12,6 +12,7 @@ import InventoryScreen from './src/screens/InventoryScreen';
 import CategoryScreen from './src/screens/CategoryScreen';
 import UsersScreen from './src/screens/UsersScreen';
 import AdminScreen from './src/screens/AdminScreen';
+import OrderManagementScreen from './src/screens/OrderManagementScreen';
 import UserDashboardScreen from './src/screens/UserDashboardScreen';
 import MyOrdersScreen from './src/screens/MyOrdersScreen';
 import MyInventoryScreen from './src/screens/MyInventoryScreen';
@@ -29,6 +30,7 @@ function AdminNavigator() {
       <AdminStack.Screen name="Inventory" component={InventoryScreen} options={{ headerShown: false }} />
       <AdminStack.Screen name="Categories" component={CategoryScreen} options={{ headerShown: false }} />
       <AdminStack.Screen name="Users" component={UsersScreen} options={{ headerShown: false }} />
+      <AdminStack.Screen name="Orders" component={OrderManagementScreen} options={{ headerShown: false }} />
     </AdminStack.Navigator>
   );
 }

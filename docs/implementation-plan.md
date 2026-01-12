@@ -526,6 +526,8 @@ postqode-nexus/
 | 4.7 | Mobile startup script | scripts/start-mobile.sh | – | ✅ |
 | 4.8 | Mobile: Category/User | Admin mobile features | [Category Management](./application-functionality.md#46-category-management-admin-only) | ✅ |
 | 4.9 | Mobile: Orders & Inventory | User mobile features | [My Inventory](./application-functionality.md#49-my-inventory-user) | ✅ |
+| 4.10 | Mobile: Order Management | Admin Order Approval | [Order Management](./application-functionality.md#48-order-management) | ✅ |
+| 4.11 | Mobile: Real Data Integration | GraphQL & REST Integration | – | ✅ |
 
 **Mobile-Specific References:**
 - **Breakpoints**: [Breakpoints](./application-functionality.md#101-breakpoints)
@@ -538,6 +540,7 @@ postqode-nexus/
 | Unit | Component tests | `cd mobile && npm run test` | ✅ |
 | Unit | Navigation tests | `npm run test -- Navigation` | ✅ |
 | Integration | API integration | `npm run test:integration` | ✅ |
+| Unit | Screen tests | `npm run test -- screens` | ✅ |
 | E2E (Android) | Full flow | `npx detox test -c android.emu.debug` | ⏳ |
 | E2E (iOS) | Full flow | `npx detox test -c ios.sim.debug` | ⏳ |
 
