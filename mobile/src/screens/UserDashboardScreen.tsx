@@ -2,10 +2,11 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { ShoppingCart, Clock, DollarSign, Box } from 'lucide-react-native';
-import { getMyOrders } from '../services/order';
+import { ShoppingCart, Clock, DollarSign, Box, LogOut } from 'lucide-react-native';
+import { getMyOrders, Order } from '../services/order';
 import { getMyInventory } from '../services/inventory';
 import { useAuthStore } from '../store/authStore';
+import { formatDistanceToNow } from 'date-fns';
 
 interface UserStats {
   pendingOrders: number;
@@ -18,7 +19,9 @@ interface UserStats {
 export default function UserDashboardScreen() {
   const navigation = useNavigation<any>();
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
   const [stats, setStats] = useState<UserStats | null>(null);
+  const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -43,6 +46,12 @@ export default function UserDashboardScreen() {
         inventoryItems: myInventory.length,
         inventoryQuantity,
       });
+
+      // Sort by date desc
+      const sortedOrders = myOrders.sort((a: any, b: any) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      setRecentOrders(sortedOrders.slice(0, 5));
     } catch (error) {
       console.error('Error loading user dashboard:', error);
     } finally {
@@ -60,6 +69,16 @@ export default function UserDashboardScreen() {
   const onRefresh = () => {
     setRefreshing(true);
     loadData();
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'APPROVED': return '#16a34a';
+      case 'PENDING': return '#ca8a04';
+      case 'REJECTED': return '#dc2626';
+      case 'CANCELLED': return '#64748b';
+      default: return '#0f172a';
+    }
   };
 
   if (loading && !refreshing) {
@@ -135,6 +154,39 @@ export default function UserDashboardScreen() {
             <Text style={styles.secondaryButtonText}>Manage Inventory</Text>
           </TouchableOpacity>
         </View>
+
+        {/* Recent Orders */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Recent Orders</Text>
+          {recentOrders.length > 0 ? (
+            recentOrders.map((order) => (
+              <View key={order.id} style={styles.orderItem}>
+                <View style={styles.orderLeft}>
+                  <Text style={styles.orderProduct}>{order.product?.name || 'Unknown Product'}</Text>
+                  <Text style={styles.orderDate}>
+                    {formatDistanceToNow(new Date(order.createdAt), { addSuffix: true })}
+                  </Text>
+                </View>
+                <View style={styles.orderRight}>
+                  <Text style={[styles.orderStatus, { color: getStatusColor(order.status) }]}>
+                    {order.status}
+                  </Text>
+                  <Text style={styles.orderPrice}>
+                    ${((order.product?.price || 0) * order.quantity).toFixed(2)}
+                  </Text>
+                </View>
+              </View>
+            ))
+          ) : (
+            <Text style={styles.emptyText}>No orders yet</Text>
+          )}
+        </View>
+
+        {/* Logout Button */}
+        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+          <LogOut size={20} color="#ef4444" />
+          <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
@@ -234,6 +286,75 @@ const styles = StyleSheet.create({
   },
   secondaryButtonText: {
     color: '#0f172a',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  section: {
+    marginTop: 24,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#0f172a',
+    marginBottom: 12,
+  },
+  orderItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  orderLeft: {
+    flex: 1,
+  },
+  orderRight: {
+    alignItems: 'flex-end',
+  },
+  orderProduct: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#0f172a',
+    marginBottom: 4,
+  },
+  orderDate: {
+    fontSize: 12,
+    color: '#64748b',
+  },
+  orderStatus: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  orderPrice: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#0f172a',
+  },
+  emptyText: {
+    color: '#64748b',
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fee2e2',
+    padding: 16,
+    borderRadius: 8,
+    marginTop: 32,
+    marginBottom: 32,
+    gap: 8,
+  },
+  logoutText: {
+    color: '#ef4444',
     fontWeight: '600',
     fontSize: 16,
   },
