@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, Dimensions, ActivityIndicator, Refr
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { PieChart } from 'react-native-chart-kit';
 import { dashboardApi, DashboardMetrics, StatusCount, ActivityLog } from '../services/graphql';
+import { getAllOrders, Order } from '../services/order';
 import { useFocusEffect } from '@react-navigation/native';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -12,19 +13,26 @@ export default function DashboardScreen() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [statusData, setStatusData] = useState<StatusCount[]>([]);
   const [recentActivity, setRecentActivity] = useState<ActivityLog[]>([]);
+  const [orderStats, setOrderStats] = useState({ pending: 0, approved: 0, rejected: 0 });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   const loadData = async () => {
     try {
-      const [metricsData, statusData, activityData] = await Promise.all([
+      const [metricsData, statusData, activityData, orders] = await Promise.all([
         dashboardApi.getDashboardMetrics(),
         dashboardApi.getProductsByStatus(),
         dashboardApi.getRecentActivity(),
+        getAllOrders(),
       ]);
       setMetrics(metricsData);
       setStatusData(statusData);
       setRecentActivity(activityData);
+      
+      const pending = orders.filter(o => o.status === 'PENDING').length;
+      const approved = orders.filter(o => o.status === 'APPROVED').length;
+      const rejected = orders.filter(o => o.status === 'REJECTED').length;
+      setOrderStats({ pending, approved, rejected });
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -87,7 +95,25 @@ export default function DashboardScreen() {
       >
         <Text style={styles.title}>Dashboard</Text>
         
-        {/* Summary Cards */}
+        {/* Order Overview */}
+        <Text style={styles.sectionTitle}>Order Overview</Text>
+        <View style={styles.statsGrid}>
+          <View style={styles.statCard}>
+            <Text style={[styles.statValue, { color: '#ca8a04' }]}>{orderStats.pending}</Text>
+            <Text style={styles.statLabel}>Pending</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={[styles.statValue, { color: '#16a34a' }]}>{orderStats.approved}</Text>
+            <Text style={styles.statLabel}>Approved</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={[styles.statValue, { color: '#dc2626' }]}>{orderStats.rejected}</Text>
+            <Text style={styles.statLabel}>Rejected</Text>
+          </View>
+        </View>
+
+        {/* Product Overview */}
+        <Text style={styles.sectionTitle}>Product Overview</Text>
         <View style={styles.statsGrid}>
           <View style={styles.statCard}>
             <Text style={styles.statValue}>{metrics?.totalProducts || 0}</Text>
@@ -195,6 +221,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#0f172a',
     marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#0f172a',
+    marginBottom: 12,
+    marginTop: 8,
   },
   statsGrid: {
     flexDirection: 'row',

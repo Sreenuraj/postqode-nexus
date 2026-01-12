@@ -11,12 +11,6 @@ export default function AdminScreen() {
 
   const menuItems = [
     {
-      title: 'Inventory Management',
-      description: 'Manage products, stock, and prices',
-      icon: <Package size={24} color="#0f172a" />,
-      screen: 'Inventory',
-    },
-    {
       title: 'Category Management',
       description: 'Organize products into categories',
       icon: <Layers size={24} color="#0f172a" />,

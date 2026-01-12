@@ -51,7 +51,12 @@ export default function ProductCatalogScreen() {
       if (reset) {
         setProducts(response.content);
       } else {
-        setProducts(prev => [...prev, ...response.content]);
+        setProducts(prev => {
+          const newProducts = response.content.filter(
+            p => !prev.some(existing => existing.id === p.id)
+          );
+          return [...prev, ...newProducts];
+        });
       }
       setTotalPages(response.totalPages);
     } catch (error) {

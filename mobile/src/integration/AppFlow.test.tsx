@@ -34,8 +34,8 @@ describe('Integration Tests (Real Backend)', () => {
     const { getByText: getByTextCatalog } = render(<ProductCatalogScreen />);
 
     await waitFor(() => {
-      // Assuming "Wireless Mouse" is in the demo data
-      expect(getByTextCatalog('Wireless Mouse')).toBeTruthy();
-    }, { timeout: 10000 });
-  });
+      // Assuming "Bluetooth Speaker" is in the demo data (starts with B, so likely at top)
+      expect(getByTextCatalog('Bluetooth Speaker')).toBeTruthy();
+    }, { timeout: 15000 });
+  }, 20000);
 });

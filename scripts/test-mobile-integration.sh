@@ -6,10 +6,11 @@ set -e
 echo "🚀 Setting up Integration Test Environment..."
 
 # Ensure cleanup runs on exit
+PROJECT_ROOT=$(pwd)
 cleanup() {
     echo ""
     echo "🧹 Cleaning up..."
-    ./scripts/stop-dev.sh
+    "$PROJECT_ROOT/scripts/stop-dev.sh"
 }
 trap cleanup EXIT
 

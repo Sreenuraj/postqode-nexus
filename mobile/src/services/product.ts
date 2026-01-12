@@ -2,7 +2,14 @@ import api from './api';
 import { Product, Page, ProductParams } from '../types';
 
 export const getProducts = async (params?: ProductParams): Promise<Page<Product>> => {
-  const response = await api.get<Page<Product>>('/api/v1/products', { params });
+  const { sortBy, sortOrder, ...rest } = params || {};
+  const queryParams: any = { ...rest };
+  
+  if (sortBy) {
+    queryParams.sort = `${sortBy},${sortOrder || 'ASC'}`;
+  }
+
+  const response = await api.get<Page<Product>>('/api/v1/products', { params: queryParams });
   return response.data;
 };
 

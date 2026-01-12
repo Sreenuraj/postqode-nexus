@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
-import { Product } from '../types';
+import { Product, Category } from '../types';
 import { createProduct, updateProduct } from '../services/product';
+import { getCategories } from '../services/category';
+import { ChevronDown } from 'lucide-react-native';
 
 interface ProductFormModalProps {
   visible: boolean;
@@ -18,8 +20,25 @@ export default function ProductFormModal({ visible, onClose, onSave, product }: 
     price: 0,
     quantity: 0,
     status: 'ACTIVE',
+    category_id: '',
   });
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
+  const [showStatusPicker, setShowStatusPicker] = useState(false);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const data = await getCategories();
+      setCategories(data);
+    } catch (error) {
+      console.error('Failed to load categories', error);
+    }
+  };
 
   useEffect(() => {
     if (product) {
@@ -30,6 +49,7 @@ export default function ProductFormModal({ visible, onClose, onSave, product }: 
         price: product.price,
         quantity: product.quantity,
         status: product.status,
+        category_id: product.category_id,
       });
     } else {
       setFormData({
@@ -39,6 +59,7 @@ export default function ProductFormModal({ visible, onClose, onSave, product }: 
         price: 0,
         quantity: 0,
         status: 'ACTIVE',
+        category_id: '',
       });
     }
   }, [product, visible]);
@@ -120,6 +141,28 @@ export default function ProductFormModal({ visible, onClose, onSave, product }: 
               keyboardType="numeric"
               placeholder="0"
             />
+
+            <Text style={styles.label}>Category</Text>
+            <TouchableOpacity 
+              style={styles.pickerButton}
+              onPress={() => setShowCategoryPicker(true)}
+            >
+              <Text style={styles.pickerButtonText}>
+                {categories.find(c => c.id === formData.category_id)?.name || 'No Category'}
+              </Text>
+              <ChevronDown size={20} color="#64748b" />
+            </TouchableOpacity>
+
+            <Text style={styles.label}>Status</Text>
+            <TouchableOpacity 
+              style={styles.pickerButton}
+              onPress={() => setShowStatusPicker(true)}
+            >
+              <Text style={styles.pickerButtonText}>
+                {formData.status?.replace('_', ' ')}
+              </Text>
+              <ChevronDown size={20} color="#64748b" />
+            </TouchableOpacity>
           </ScrollView>
 
           <View style={styles.footer}>
@@ -142,6 +185,59 @@ export default function ProductFormModal({ visible, onClose, onSave, product }: 
           </View>
         </View>
       </View>
+
+      {/* Category Picker Modal */}
+      <Modal visible={showCategoryPicker} transparent animationType="fade">
+        <TouchableOpacity style={styles.pickerOverlay} onPress={() => setShowCategoryPicker(false)}>
+          <View style={styles.pickerContent}>
+            <Text style={styles.pickerTitle}>Select Category</Text>
+            <ScrollView style={{ maxHeight: 300 }}>
+              <TouchableOpacity
+                style={styles.pickerOption}
+                onPress={() => {
+                  setFormData({ ...formData, category_id: undefined });
+                  setShowCategoryPicker(false);
+                }}
+              >
+                <Text style={styles.pickerOptionText}>No Category</Text>
+              </TouchableOpacity>
+              {categories.map((cat) => (
+                <TouchableOpacity
+                  key={cat.id}
+                  style={styles.pickerOption}
+                  onPress={() => {
+                    setFormData({ ...formData, category_id: cat.id });
+                    setShowCategoryPicker(false);
+                  }}
+                >
+                  <Text style={styles.pickerOptionText}>{cat.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Status Picker Modal */}
+      <Modal visible={showStatusPicker} transparent animationType="fade">
+        <TouchableOpacity style={styles.pickerOverlay} onPress={() => setShowStatusPicker(false)}>
+          <View style={styles.pickerContent}>
+            <Text style={styles.pickerTitle}>Select Status</Text>
+            {['ACTIVE', 'LOW_STOCK', 'OUT_OF_STOCK'].map((status) => (
+              <TouchableOpacity
+                key={status}
+                style={styles.pickerOption}
+                onPress={() => {
+                  setFormData({ ...formData, status: status as any });
+                  setShowStatusPicker(false);
+                }}
+              >
+                <Text style={styles.pickerOptionText}>{status.replace('_', ' ')}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </Modal>
   );
 }
@@ -191,6 +287,48 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
     color: '#0f172a',
+  },
+  pickerButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  pickerButtonText: {
+    fontSize: 16,
+    color: '#0f172a',
+  },
+  pickerOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  pickerContent: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+  },
+  pickerTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#0f172a',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  pickerOption: {
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f1f5f9',
+  },
+  pickerOptionText: {
+    fontSize: 16,
+    color: '#0f172a',
+    textAlign: 'center',
   },
   textArea: {
     height: 100,

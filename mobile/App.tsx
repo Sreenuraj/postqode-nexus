@@ -3,7 +3,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, TouchableOpacity } from 'react-native';
+import { LayoutDashboard, ShoppingBag, User, Shield, LogOut } from 'lucide-react-native';
 
 import LoginScreen from './src/screens/LoginScreen';
 import ProductCatalogScreen from './src/screens/ProductCatalogScreen';
@@ -27,7 +28,6 @@ function AdminNavigator() {
   return (
     <AdminStack.Navigator>
       <AdminStack.Screen name="AdminDashboard" component={AdminScreen} options={{ headerShown: false }} />
-      <AdminStack.Screen name="Inventory" component={InventoryScreen} options={{ headerShown: false }} />
       <AdminStack.Screen name="Categories" component={CategoryScreen} options={{ headerShown: false }} />
       <AdminStack.Screen name="Users" component={UsersScreen} options={{ headerShown: false }} />
       <AdminStack.Screen name="Orders" component={OrderManagementScreen} options={{ headerShown: false }} />
@@ -46,16 +46,65 @@ function UserNavigator() {
 }
 
 function AppNavigator() {
-  const user = useAuthStore((state) => state.user);
+  const { user, logout } = useAuthStore();
   
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Dashboard" component={DashboardScreen} options={{ headerShown: false }} />
-      <Tab.Screen name="Catalog" component={ProductCatalogScreen} options={{ headerShown: false }} />
+    <Tab.Navigator
+      screenOptions={{
+        tabBarActiveTintColor: '#0f172a',
+        tabBarInactiveTintColor: '#64748b',
+        headerRight: () => (
+          <TouchableOpacity onPress={logout} style={{ marginRight: 16 }}>
+            <LogOut size={20} color="#ef4444" />
+          </TouchableOpacity>
+        ),
+      }}
+    >
       {user?.role === 'ADMIN' ? (
-        <Tab.Screen name="Admin" component={AdminNavigator} options={{ headerShown: false }} />
+        <>
+          <Tab.Screen 
+            name="Dashboard" 
+            component={DashboardScreen} 
+            options={{ 
+              tabBarIcon: ({ color, size }) => <LayoutDashboard size={size} color={color} />
+            }} 
+          />
+          <Tab.Screen 
+            name="Catalog" 
+            component={ProductCatalogScreen} 
+            options={{ 
+              headerShown: false,
+              tabBarIcon: ({ color, size }) => <ShoppingBag size={size} color={color} />
+            }} 
+          />
+          <Tab.Screen 
+            name="Admin" 
+            component={AdminNavigator} 
+            options={{ 
+              headerShown: false,
+              tabBarIcon: ({ color, size }) => <Shield size={size} color={color} />
+            }} 
+          />
+        </>
       ) : (
-        <Tab.Screen name="Profile" component={UserNavigator} options={{ headerShown: false }} />
+        <>
+          <Tab.Screen 
+            name="Dashboard" 
+            component={UserNavigator} 
+            options={{ 
+              headerShown: false,
+              tabBarIcon: ({ color, size }) => <LayoutDashboard size={size} color={color} />
+            }} 
+          />
+          <Tab.Screen 
+            name="Catalog" 
+            component={ProductCatalogScreen} 
+            options={{ 
+              headerShown: false,
+              tabBarIcon: ({ color, size }) => <ShoppingBag size={size} color={color} />
+            }} 
+          />
+        </>
       )}
     </Tab.Navigator>
   );
