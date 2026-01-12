@@ -42,7 +42,13 @@ export default function LoginScreen() {
       await setAuth(response.token, user);
     } catch (error: any) {
       console.error('Login error:', error);
-      Alert.alert('Login Failed', error.response?.data?.message || error.message || 'Invalid credentials');
+      let message = error.response?.data?.message || error.message || 'Invalid credentials';
+      
+      if (error.response?.status === 401) {
+        message = 'Invalid username or password';
+      }
+      
+      Alert.alert('Login Failed', message);
     } finally {
       setLoading(false);
     }
