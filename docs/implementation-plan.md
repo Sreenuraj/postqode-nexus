@@ -543,8 +543,8 @@ postqode-nexus/
 | Integration | API integration | `npm run test:integration` | ✅ |
 | Integration | Real Backend Flow | `./scripts/test-mobile-integration.sh` | ✅ |
 | Unit | Screen tests | `npm run test -- screens` | ✅ |
-| E2E (Android) | Full flow | `npx detox test -c android.emu.debug` | ⏳ |
-| E2E (iOS) | Full flow | `npx detox test -c ios.sim.debug` | ⏳ |
+| E2E (Android) | Full flow | `npx detox test -c android.emu.debug` | ✅ |
+| E2E (iOS) | Full flow | `npx detox test -c ios.sim.debug` | ✅ |
 
 #### ✅ Phase 4 Manual Testing Checklist
 
