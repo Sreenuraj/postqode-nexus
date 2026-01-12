@@ -14,6 +14,11 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
+# Load .env variables if present
+if [ -f "$PROJECT_ROOT/.env" ]; then
+    export $(grep -v '^#' "$PROJECT_ROOT/.env" | xargs)
+fi
+
 cd "$PROJECT_ROOT/frontend"
 
 # Check if node_modules exists
@@ -25,10 +30,10 @@ fi
 echo ""
 echo -e "${GREEN}🌐 Starting Vite dev server...${NC}"
 echo ""
-echo "Access at: http://localhost:5173"
+echo "Access at: http://localhost:${FRONTEND_PORT:-3000}"
 echo ""
 
-npm run dev
+npm run dev -- --port ${FRONTEND_PORT:-3000}
 
 # Note: This script will block while frontend is running
 # Press Ctrl+C to stop

@@ -4,6 +4,11 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+ARG VITE_API_URL
+ARG VITE_GRAPHQL_URL
+# Make sure VITE_ environment variables are available during build
+ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_GRAPHQL_URL=$VITE_GRAPHQL_URL
 RUN npm run build
 
 # Runtime stage

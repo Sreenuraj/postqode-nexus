@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 cd "$PROJECT_ROOT/docker"
 
 if [ -f "docker-compose.yml" ]; then
-    docker-compose down
+    docker-compose --env-file "$PROJECT_ROOT/.env" down
     echo ""
     echo -e "${GREEN}✅ All services stopped!${NC}"
 else

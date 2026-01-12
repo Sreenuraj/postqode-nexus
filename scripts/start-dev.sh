@@ -44,11 +44,11 @@ start_db() {
         if docker ps -a | grep -q nexus-db; then
             docker start nexus-db
         else
-            docker run -d --name nexus-db -p 5432:5432 \
-                -e POSTGRES_DB=nexus \
-                -e POSTGRES_USER=nexus \
-                -e POSTGRES_PASSWORD=nexus123 \
-                postgres:15-alpine
+            docker run -d --name nexus-db -p ${DB_PORT:-5432}:5432 \
+                -e POSTGRES_DB=${DB_NAME:-nexus} \
+                -e POSTGRES_USER=${DB_USER:-nexus} \
+                -e POSTGRES_PASSWORD=${DB_PASSWORD:-nexus123} \
+                postgres:${POSTGRES_VERSION:-15-alpine}
         fi
         echo "   ⏳ Waiting for database..."
         sleep 5
@@ -64,16 +64,16 @@ start_backend() {
     cd "$PROJECT_ROOT/backend"
     
     # Check if already running
-    if lsof -Pi :8080 -sTCP:LISTEN -t >/dev/null 2>&1; then
-        echo -e "${YELLOW}   Already running on port 8080${NC}"
+    if lsof -Pi :${BACKEND_PORT:-8080} -sTCP:LISTEN -t >/dev/null 2>&1; then
+        echo -e "${YELLOW}   Already running on port ${BACKEND_PORT:-8080}${NC}"
     else
         nohup ./mvnw spring-boot:run > /tmp/nexus-backend.log 2>&1 &
         echo "   PID: $!"
         echo "   ⏳ Waiting for backend to start..."
         sleep 15
         
-        if curl -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
-            echo -e "${GREEN}   ✅ Backend ready on port 8080${NC}"
+        if curl -s http://localhost:${BACKEND_PORT:-8080}/actuator/health > /dev/null 2>&1; then
+            echo -e "${GREEN}   ✅ Backend ready on port ${BACKEND_PORT:-8080}${NC}"
         else
             echo -e "${YELLOW}   ⏳ Still starting... check /tmp/nexus-backend.log${NC}"
         fi
@@ -93,13 +93,13 @@ start_frontend() {
     fi
     
     # Check if already running
-    if lsof -Pi :3000 -sTCP:LISTEN -t >/dev/null 2>&1; then
-        echo -e "${YELLOW}   Already running on port 3000${NC}"
+    if lsof -Pi :${FRONTEND_PORT:-3000} -sTCP:LISTEN -t >/dev/null 2>&1; then
+        echo -e "${YELLOW}   Already running on port ${FRONTEND_PORT:-3000}${NC}"
     else
-        nohup npm run dev > /tmp/nexus-frontend.log 2>&1 &
+        nohup npm run dev -- --port ${FRONTEND_PORT:-3000} > /tmp/nexus-frontend.log 2>&1 &
         echo "   PID: $!"
         sleep 3
-        echo -e "${GREEN}   ✅ Frontend ready on port 3000${NC}"
+        echo -e "${GREEN}   ✅ Frontend ready on port ${FRONTEND_PORT:-3000}${NC}"
     fi
 }
 
@@ -115,11 +115,11 @@ echo -e "${GREEN}🎉 Development environment ready!${NC}"
 echo "=========================================="
 echo ""
 echo -e "${BLUE}🔗 Access URLs:${NC}"
-echo "   • Backend Health: http://localhost:8080/actuator/health"
-echo "   • Swagger UI:     http://localhost:8080/swagger-ui.html"
-echo "   • GraphiQL:       http://localhost:8080/graphiql (Interactive IDE)"
-echo "   • Raw Schema:     http://localhost:8080/graphql-schema"
-echo "   • Frontend:       http://localhost:3000"
+echo "   • Backend Health: http://localhost:${BACKEND_PORT:-8080}/actuator/health"
+echo "   • Swagger UI:     http://localhost:${BACKEND_PORT:-8080}/swagger-ui.html"
+echo "   • GraphiQL:       http://localhost:${BACKEND_PORT:-8080}/graphiql (Interactive IDE)"
+echo "   • Raw Schema:     http://localhost:${BACKEND_PORT:-8080}/graphql-schema"
+echo "   • Frontend:       http://localhost:${FRONTEND_PORT:-3000}"
 echo ""
 echo -e "${BLUE}📊 Demo Credentials:${NC}"
 echo "   • Admin: admin / Admin@123"

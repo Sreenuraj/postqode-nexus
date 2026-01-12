@@ -22,11 +22,11 @@ check_db() {
         return 0
     else
         echo -e "${YELLOW}⚠️  Database not running. Starting it...${NC}"
-        docker run -d --name nexus-db -p 5432:5432 \
-            -e POSTGRES_DB=nexus \
-            -e POSTGRES_USER=nexus \
-            -e POSTGRES_PASSWORD=nexus123 \
-            postgres:15-alpine
+        docker run -d --name nexus-db -p ${DB_PORT:-5432}:5432 \
+            -e POSTGRES_DB=${DB_NAME:-nexus} \
+            -e POSTGRES_USER=${DB_USER:-nexus} \
+            -e POSTGRES_PASSWORD=${DB_PASSWORD:-nexus123} \
+            postgres:${POSTGRES_VERSION:-15-alpine}
         echo "⏳ Waiting for database to be ready..."
         sleep 5
         return 0

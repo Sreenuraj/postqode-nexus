@@ -9,16 +9,24 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Load .env variables if present
+if [ -f "$PROJECT_ROOT/.env" ]; then
+    export $(grep -v '^#' "$PROJECT_ROOT/.env" | xargs)
+fi
+
 # Stop backend
 echo "☕ Stopping Backend..."
 pkill -f "spring-boot:run" 2>/dev/null || echo -e "${YELLOW}   Not running${NC}"
-lsof -ti:8080 | xargs kill 2>/dev/null || true
+lsof -ti:${BACKEND_PORT:-8080} | xargs kill 2>/dev/null || true
 echo -e "${GREEN}   ✅ Backend stopped${NC}"
 
 # Stop frontend
 echo "⚛️  Stopping Frontend..."
 pkill -f "vite" 2>/dev/null || echo -e "${YELLOW}   Not running${NC}"
-lsof -ti:3000 | xargs kill 2>/dev/null || true
+lsof -ti:${FRONTEND_PORT:-3000} | xargs kill 2>/dev/null || true
 echo -e "${GREEN}   ✅ Frontend stopped${NC}"
 
 # Stop database

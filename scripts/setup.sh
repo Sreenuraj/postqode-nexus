@@ -103,8 +103,13 @@ echo "📊 Demo credentials:"
 echo "   • Admin: admin / Admin@123"
 echo "   • User:  user / User@123"
 echo ""
+# Load .env locally to get variables for display
+if [ -f ".env" ]; then
+    export $(grep -v '^#' ".env" | xargs)
+fi
+
 echo "🔗 URLs:"
-echo "   • Backend:  http://localhost:8080"
-echo "   • Frontend: http://localhost:5173"
-echo "   • Database: localhost:5432"
+echo "   • Backend:  http://localhost:${BACKEND_PORT:-8080}"
+echo "   • Frontend: http://localhost:${FRONTEND_PORT:-3000}"
+echo "   • Database: localhost:${DB_PORT:-5432}"
 echo ""

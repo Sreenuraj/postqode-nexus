@@ -23,6 +23,11 @@ if [ ! -f "$PROJECT_ROOT/.env" ]; then
     cp "$PROJECT_ROOT/.env.example" "$PROJECT_ROOT/.env"
 fi
 
+# Load .env locally to get variables for display
+if [ -f "$PROJECT_ROOT/.env" ]; then
+    export $(grep -v '^#' "$PROJECT_ROOT/.env" | xargs)
+fi
+
 echo "🐳 Starting Docker Compose services..."
 docker-compose --env-file "$PROJECT_ROOT/.env" up -d --build
 
@@ -41,11 +46,11 @@ echo -e "${GREEN}🎉 All services started!${NC}"
 echo "=========================================="
 echo ""
 echo -e "${BLUE}🔗 Access URLs:${NC}"
-echo "   • Backend Health: http://localhost:8080/actuator/health"
-echo "   • Swagger UI:     http://localhost:8080/swagger-ui.html"
-echo "   • GraphiQL:       http://localhost:8080/graphiql (Interactive IDE)"
-echo "   • Raw Schema:     http://localhost:8080/graphql-schema"
-echo "   • Frontend:       http://localhost:3000"
+echo "   • Backend Health: http://localhost:${BACKEND_PORT:-8080}/actuator/health"
+echo "   • Swagger UI:     http://localhost:${BACKEND_PORT:-8080}/swagger-ui.html"
+echo "   • GraphiQL:       http://localhost:${BACKEND_PORT:-8080}/graphiql (Interactive IDE)"
+echo "   • Raw Schema:     http://localhost:${BACKEND_PORT:-8080}/graphql-schema"
+echo "   • Frontend:       http://localhost:${FRONTEND_PORT:-3000}"
 echo ""
 echo -e "${BLUE}📊 Demo Credentials:${NC}"
 echo "   • Admin: admin / Admin@123"
