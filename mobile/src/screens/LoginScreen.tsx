@@ -1,27 +1,48 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Eye, EyeOff } from 'lucide-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuthStore } from '../store/authStore';
-import { login } from '../services/auth';
+import { login, getMe } from '../services/auth';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const setAuth = useAuthStore((state) => state.login);
 
   const handleLogin = async () => {
-    if (!username || !password) {
+    const trimmedUsername = username.trim();
+    const trimmedPassword = password.trim();
+
+    if (!trimmedUsername || !trimmedPassword) {
       Alert.alert('Error', 'Please enter username and password');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await login(username, password);
-      await setAuth(response.token, response.user);
+      const response = await login(trimmedUsername, trimmedPassword);
+      let user = response.user;
+
+      // If user details are not returned in login response, fetch them
+      if (!user) {
+        // Temporarily store token for api interceptor
+        await AsyncStorage.setItem('token', response.token);
+        try {
+          user = await getMe();
+        } catch (e) {
+          await AsyncStorage.removeItem('token');
+          throw e;
+        }
+      }
+
+      await setAuth(response.token, user);
     } catch (error: any) {
-      Alert.alert('Login Failed', error.response?.data?.message || 'Invalid credentials');
+      console.error('Login error:', error);
+      Alert.alert('Login Failed', error.response?.data?.message || error.message || 'Invalid credentials');
     } finally {
       setLoading(false);
     }
@@ -41,16 +62,31 @@ export default function LoginScreen() {
             value={username}
             onChangeText={setUsername}
             autoCapitalize="none"
+            autoCorrect={false}
           />
 
           <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+          <View style={styles.passwordContainer}>
+            <TextInput
+              style={[styles.input, styles.passwordInput]}
+              placeholder="Enter password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
+            <TouchableOpacity 
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
+            >
+              {showPassword ? (
+                <EyeOff size={20} color="#64748b" />
+              ) : (
+                <Eye size={20} color="#64748b" />
+              )}
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity 
             style={styles.button} 
@@ -63,6 +99,12 @@ export default function LoginScreen() {
               <Text style={styles.buttonText}>Login</Text>
             )}
           </TouchableOpacity>
+
+          <View style={styles.hintContainer}>
+            <Text style={styles.hintTitle}>Default Credentials:</Text>
+            <Text style={styles.hintText}>Admin: admin / Admin@123</Text>
+            <Text style={styles.hintText}>User: user / User@123</Text>
+          </View>
         </View>
       </View>
     </SafeAreaView>
@@ -111,6 +153,22 @@ const styles = StyleSheet.create({
     color: '#0f172a',
     backgroundColor: '#f8fafc',
   },
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+    borderRadius: 8,
+    backgroundColor: '#f8fafc',
+  },
+  passwordInput: {
+    flex: 1,
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+  },
+  eyeIcon: {
+    padding: 12,
+  },
   button: {
     height: 48,
     backgroundColor: '#0f172a',
@@ -123,5 +181,23 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  hintContainer: {
+    marginTop: 24,
+    padding: 16,
+    backgroundColor: '#f1f5f9',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  hintTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#475569',
+    marginBottom: 4,
+  },
+  hintText: {
+    fontSize: 14,
+    color: '#64748b',
+    fontFamily: 'monospace',
   },
 });
