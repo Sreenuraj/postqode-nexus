@@ -15,6 +15,7 @@ export default function ProductCatalogScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
   const [sortBy, setSortBy] = useState('name');
@@ -31,16 +32,16 @@ export default function ProductCatalogScreen() {
   const user = useAuthStore((state) => state.user);
   const isAdmin = user?.role === 'ADMIN';
 
-  const loadProducts = async (reset = false) => {
+  const loadProducts = async (reset = false, pageToLoad = page) => {
     if (reset) {
       setLoading(true);
       setPage(0);
+      pageToLoad = 0;
     }
 
     try {
-      const currentPage = reset ? 0 : page;
       const response = await getProducts({
-        page: currentPage,
+        page: pageToLoad,
         pageSize: 10,
         search,
         status: statusFilter !== 'ALL' ? statusFilter : undefined,
@@ -59,6 +60,7 @@ export default function ProductCatalogScreen() {
         });
       }
       setTotalPages(response.totalPages);
+      setTotalProducts(response.totalElements);
     } catch (error) {
       console.error(error);
     } finally {
@@ -83,8 +85,9 @@ export default function ProductCatalogScreen() {
 
   const handleLoadMore = () => {
     if (page < totalPages - 1 && !loading) {
-      setPage(prev => prev + 1);
-      loadProducts();
+      const nextPage = page + 1;
+      setPage(nextPage);
+      loadProducts(false, nextPage);
     }
   };
 
@@ -221,6 +224,9 @@ export default function ProductCatalogScreen() {
             </TouchableOpacity>
           )}
         </View>
+        <Text style={styles.countText}>
+          Showing {products.length} of {totalProducts} products
+        </Text>
       </View>
 
       <FlatList
@@ -369,6 +375,12 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: '#0f172a',
+  },
+  countText: {
+    fontSize: 12,
+    color: '#64748b',
+    marginTop: 8,
+    textAlign: 'center',
   },
   list: {
     padding: 16,
