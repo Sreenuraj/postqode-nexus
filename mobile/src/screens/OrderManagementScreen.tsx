@@ -94,11 +94,7 @@ export default function OrderManagementScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Order Management</Text>
-      </View>
-
+    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       {loading ? (
         <ActivityIndicator size="large" style={styles.loader} />
       ) : (
@@ -122,17 +118,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8fafc',
-  },
-  header: {
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#0f172a',
   },
   loader: {
     flex: 1,

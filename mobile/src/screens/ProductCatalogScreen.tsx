@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, TextInput, Modal, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Search, Filter, ArrowUpDown, Plus, ShoppingCart, Edit, Trash2, X, LogOut } from 'lucide-react-native';
+import { Search, Filter, ArrowUpDown, Plus, ShoppingCart, Edit, Trash2, X } from 'lucide-react-native';
 import { getProducts, deleteProduct } from '../services/product';
 import { Product } from '../types';
 import { useAuthStore } from '../store/authStore';
@@ -30,7 +30,6 @@ export default function ProductCatalogScreen() {
   const [editingProduct, setEditingProduct] = useState<Product | undefined>(undefined);
 
   const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
   const isAdmin = user?.role === 'ADMIN';
 
   const loadProducts = async (reset = false, pageToLoad = page) => {
@@ -224,9 +223,6 @@ export default function ProductCatalogScreen() {
               <Plus size={20} color="#fff" />
             </TouchableOpacity>
           )}
-          <TouchableOpacity style={styles.iconButton} onPress={logout}>
-            <LogOut size={20} color="#ef4444" />
-          </TouchableOpacity>
         </View>
         <Text style={styles.countText}>
           Showing {products.length} of {totalProducts} products

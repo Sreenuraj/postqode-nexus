@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, TouchableOpacity, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getMyInventory, deleteInventoryItem, InventoryItem } from '../services/inventory';
-import InventoryItemFormModal from '../components/InventoryItemFormModal';
+import { getMyInventory, InventoryItem } from '../services/inventory';
 import ConsumeModal from '../components/ConsumeModal';
-import { Plus, Edit2, Trash2, MinusCircle } from 'lucide-react-native';
+import { MinusCircle } from 'lucide-react-native';
 
 export default function MyInventoryScreen() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [formModalVisible, setFormModalVisible] = useState(false);
   const [consumeModalVisible, setConsumeModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 
@@ -29,42 +27,9 @@ export default function MyInventoryScreen() {
     }
   };
 
-  const handleAdd = () => {
-    setSelectedItem(null);
-    setFormModalVisible(true);
-  };
-
-  const handleEdit = (item: InventoryItem) => {
-    setSelectedItem(item);
-    setFormModalVisible(true);
-  };
-
   const handleConsume = (item: InventoryItem) => {
     setSelectedItem(item);
     setConsumeModalVisible(true);
-  };
-
-  const handleDelete = (item: InventoryItem) => {
-    Alert.alert(
-      'Delete Item',
-      `Are you sure you want to delete ${item.name}?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await deleteInventoryItem(item.id);
-              loadInventory();
-            } catch (error) {
-              console.error(error);
-              Alert.alert('Error', 'Failed to delete item');
-            }
-          },
-        },
-      ]
-    );
   };
 
   const renderItem = ({ item }: { item: InventoryItem }) => (
@@ -82,12 +47,6 @@ export default function MyInventoryScreen() {
           <TouchableOpacity onPress={() => handleConsume(item)} style={styles.actionButton}>
             <MinusCircle size={20} color="#f59e0b" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleEdit(item)} style={styles.actionButton}>
-            <Edit2 size={20} color="#64748b" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDelete(item)} style={styles.actionButton}>
-            <Trash2 size={20} color="#ef4444" />
-          </TouchableOpacity>
         </View>
       </View>
       <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
@@ -96,14 +55,7 @@ export default function MyInventoryScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>My Inventory</Text>
-        <TouchableOpacity onPress={handleAdd} style={styles.addButton}>
-          <Plus size={24} color="#fff" />
-        </TouchableOpacity>
-      </View>
-      
+    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       {loading ? (
         <ActivityIndicator size="large" style={styles.loader} />
       ) : (
@@ -120,13 +72,6 @@ export default function MyInventoryScreen() {
         />
       )}
 
-      <InventoryItemFormModal
-        visible={formModalVisible}
-        onClose={() => setFormModalVisible(false)}
-        onSave={loadInventory}
-        item={selectedItem}
-      />
-
       <ConsumeModal
         visible={consumeModalVisible}
         onClose={() => setConsumeModalVisible(false)}
@@ -141,28 +86,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f8fafc',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#0f172a',
-  },
-  addButton: {
-    backgroundColor: '#0f172a',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   loader: {
     flex: 1,

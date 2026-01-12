@@ -48,7 +48,6 @@ function AppNavigator() {
             name="Catalog" 
             component={ProductCatalogScreen} 
             options={{ 
-              headerShown: false,
               tabBarIcon: ({ color, size }) => <ShoppingBag size={size} color={color} />
             }} 
           />
@@ -87,7 +86,6 @@ function AppNavigator() {
             name="Catalog" 
             component={ProductCatalogScreen} 
             options={{ 
-              headerShown: false,
               tabBarIcon: ({ color, size }) => <ShoppingBag size={size} color={color} />
             }} 
           />

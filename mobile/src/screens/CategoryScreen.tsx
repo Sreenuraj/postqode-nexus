@@ -79,9 +79,8 @@ export default function CategoryScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Category Management</Text>
+    <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
+      <View style={styles.toolbar}>
         <TouchableOpacity onPress={handleAdd} style={styles.addButton}>
           <Plus size={24} color="#fff" />
         </TouchableOpacity>
@@ -113,19 +112,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8fafc',
   },
-  header: {
+  toolbar: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: 'flex-end',
     padding: 16,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#e2e8f0',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#0f172a',
   },
   addButton: {
     backgroundColor: '#0f172a',
