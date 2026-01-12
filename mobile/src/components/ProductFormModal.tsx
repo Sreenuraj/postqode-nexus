@@ -20,7 +20,7 @@ export default function ProductFormModal({ visible, onClose, onSave, product }: 
     price: 0,
     quantity: 0,
     status: 'ACTIVE',
-    category_id: '',
+    categoryId: '',
   });
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -49,7 +49,7 @@ export default function ProductFormModal({ visible, onClose, onSave, product }: 
         price: product.price,
         quantity: product.quantity,
         status: product.status,
-        category_id: product.category_id,
+        categoryId: product.categoryId,
       });
     } else {
       setFormData({
@@ -59,7 +59,7 @@ export default function ProductFormModal({ visible, onClose, onSave, product }: 
         price: 0,
         quantity: 0,
         status: 'ACTIVE',
-        category_id: '',
+        categoryId: '',
       });
     }
   }, [product, visible]);
@@ -148,7 +148,7 @@ export default function ProductFormModal({ visible, onClose, onSave, product }: 
               onPress={() => setShowCategoryPicker(true)}
             >
               <Text style={styles.pickerButtonText}>
-                {categories.find(c => c.id === formData.category_id)?.name || 'No Category'}
+                {categories.find(c => c.id === formData.categoryId)?.name || 'No Category'}
               </Text>
               <ChevronDown size={20} color="#64748b" />
             </TouchableOpacity>
@@ -195,7 +195,7 @@ export default function ProductFormModal({ visible, onClose, onSave, product }: 
               <TouchableOpacity
                 style={styles.pickerOption}
                 onPress={() => {
-                  setFormData({ ...formData, category_id: undefined });
+                  setFormData({ ...formData, categoryId: undefined });
                   setShowCategoryPicker(false);
                 }}
               >
@@ -206,7 +206,7 @@ export default function ProductFormModal({ visible, onClose, onSave, product }: 
                   key={cat.id}
                   style={styles.pickerOption}
                   onPress={() => {
-                    setFormData({ ...formData, category_id: cat.id });
+                    setFormData({ ...formData, categoryId: cat.id });
                     setShowCategoryPicker(false);
                   }}
                 >

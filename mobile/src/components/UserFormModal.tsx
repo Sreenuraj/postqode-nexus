@@ -38,7 +38,7 @@ export default function UserFormModal({ visible, onClose, onSave, user }: UserFo
   }, [user, visible]);
 
   const handleSubmit = async () => {
-    if (!formData.username || !formData.email) {
+    if (!formData.username) {
       Alert.alert('Error', 'Please fill in all required fields');
       return;
     }
@@ -87,7 +87,7 @@ export default function UserFormModal({ visible, onClose, onSave, user }: UserFo
               autoCapitalize="none"
             />
 
-            <Text style={styles.label}>Email *</Text>
+            <Text style={styles.label}>Email (optional)</Text>
             <TextInput
               style={styles.input}
               value={formData.email}

@@ -14,7 +14,8 @@ export interface Product {
   price: number;
   quantity: number;
   status: 'ACTIVE' | 'LOW_STOCK' | 'OUT_OF_STOCK';
-  category_id?: string;
+  categoryId?: string;
+  categoryName?: string;
 }
 
 export interface Category {
