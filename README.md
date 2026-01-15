@@ -1,8 +1,22 @@
 # PostQode Nexus
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Platform](https://img.shields.io/badge/Platform-Web%20%7C%20iOS%20%7C%20Android-blue)]()
+[![Demo](https://img.shields.io/badge/Purpose-Demo%20%7C%20Educational-green)]()
+
 > **From requirements to reality**
 
-PostQode Nexus is a CI/CD-ready demo application designed to showcase the full PostQode value chain — from BRD ingestion to automation readiness.
+PostQode Nexus is a **full-stack demo application** showcasing modern software development practices, mobile app distribution, and the complete PostQode value chain — from BRD ingestion to automation readiness.
+
+## ⚠️ Demo & Educational Purpose
+
+This repository is created for:
+- **PostQode demo videos** and presentations
+- **Educational purposes** - learning full-stack development
+- **Reference implementation** - best practices showcase
+- **Mobile app distribution** - Android APK and iOS builds
+
+**Note**: This is a demonstration project. While functional, it's designed for learning and showcasing capabilities rather than production use.
 
 ## 🎯 Purpose
 
@@ -96,10 +110,47 @@ docker-compose up -d
 | Admin | admin | Admin@123 |
 | User | user | User@123 |
 
+## 📱 Mobile Apps
+
+### Android
+- **Build**: `./scripts/build-mobile-android.sh`
+- **Output**: `mobile/android/app/build/outputs/apk/debug/app-debug.apk`
+- **Distribution**: Share APK directly - works on any Android device
+
+### iOS
+- **Simulator**: `./scripts/build-mobile-ios.sh`
+- **Physical Device**: `./scripts/build-mobile-ios.sh device`
+- **Distribution**: TestFlight, Ad Hoc, or App Store
+
+📖 **Complete Guide**: See [Mobile Build & Distribution Guide](./docs/mobile-build-guide.md)
+
+## 📚 Additional Documentation
+
+- [Mobile Build Guide](./docs/mobile-build-guide.md) — Build and distribute mobile apps
+- [Development Guide](./docs/development-guide.md) — Setup and development workflow
+- [Testing Guide](./docs/testing-guide.md) — Testing strategies
+- [API Strategy](./docs/api-strategy.md) — REST and GraphQL APIs
+
+## 🤝 Contributing
+
+This is a demo project for PostQode. While it's open source under MIT license, it's primarily maintained for demonstration purposes.
+
 ## 📄 License
 
-Proprietary — PostQode Internal
+MIT License - see the [LICENSE](LICENSE) file for details.
+
+Copyright (c) 2026
+
+**Permission is granted** to use, copy, modify, and distribute this software for any purpose, including commercial applications, subject to the terms in the LICENSE file.
+
+## 🙏 Acknowledgments
+
+- Built as a demonstration of modern full-stack development
+- Showcases React, React Native, Spring Boot, and PostgreSQL
+- Demonstrates mobile app build and distribution workflows
 
 ---
+
+**⭐ Star this repo** if you find it useful for learning or reference!
 
 *Built with ❤️ by the PostQode Team*
