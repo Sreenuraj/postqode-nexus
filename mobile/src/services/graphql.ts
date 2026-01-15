@@ -5,6 +5,8 @@ import { Platform } from 'react-native';
 
 const getBaseUrl = () => {
   const url = API_BASE_URL || 'http://localhost:8080';
+  // Only replace localhost with 10.0.2.2 for Android emulator if URL actually contains localhost
+  // This allows production URLs to work even in debug builds
   if (__DEV__ && Platform.OS === 'android' && url.includes('localhost')) {
     return url.replace('localhost', '10.0.2.2');
   }
@@ -17,6 +19,9 @@ const graphqlClient = axios.create({
   baseURL: GRAPHQL_URL,
   headers: {
     'Content-Type': 'application/json',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
+    'Pragma': 'no-cache',
+    'Expires': '0',
   },
 });
 
