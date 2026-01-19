@@ -119,7 +119,12 @@ export default function ProductCatalogScreen() {
   };
 
   const renderItem = ({ item }: { item: Product }) => (
-    <View style={styles.card}>
+    <View 
+      style={styles.card}
+      testID={`catalog-item-product-${item.id}`}
+      accessible={true}
+      accessibilityLabel={`Product: ${item.name}, Price: $${item.price.toFixed(2)}, Stock: ${item.quantity}`}
+    >
       <View style={styles.cardHeader}>
         <View style={styles.titleContainer}>
           <Text style={styles.productName}>{item.name}</Text>
@@ -147,12 +152,20 @@ export default function ProductCatalogScreen() {
                   setEditingProduct(item);
                   setFormModalVisible(true);
                 }}
+                testID={`catalog-button-edit-${item.id}`}
+                accessibilityLabel={`Edit ${item.name}`}
+                accessibilityRole="button"
+                accessible={true}
               >
                 <Edit size={16} color="#0f172a" />
               </TouchableOpacity>
               <TouchableOpacity 
                 style={[styles.actionButton, styles.deleteButton]}
                 onPress={() => handleDelete(item)}
+                testID={`catalog-button-delete-${item.id}`}
+                accessibilityLabel={`Delete ${item.name}`}
+                accessibilityRole="button"
+                accessible={true}
               >
                 <Trash2 size={16} color="#ef4444" />
               </TouchableOpacity>
@@ -165,6 +178,10 @@ export default function ProductCatalogScreen() {
                 setBuyModalVisible(true);
               }}
               disabled={item.quantity === 0}
+              testID={`catalog-button-buy-${item.id}`}
+              accessibilityLabel={`Buy ${item.name}`}
+              accessibilityRole="button"
+              accessible={true}
             >
               <ShoppingCart size={16} color="#fff" />
               <Text style={styles.buyButtonText}>Buy</Text>
@@ -194,9 +211,18 @@ export default function ProductCatalogScreen() {
             placeholder="Search products..."
             value={search}
             onChangeText={setSearch}
+            testID="catalog-input-search"
+            accessibilityLabel="Search products"
+            accessible={true}
           />
           {search.length > 0 && (
-            <TouchableOpacity onPress={() => setSearch('')}>
+            <TouchableOpacity 
+              onPress={() => setSearch('')}
+              testID="catalog-button-clear-search"
+              accessibilityLabel="Clear search"
+              accessibilityRole="button"
+              accessible={true}
+            >
               <X size={16} color="#64748b" />
             </TouchableOpacity>
           )}
@@ -206,10 +232,21 @@ export default function ProductCatalogScreen() {
           <TouchableOpacity 
             style={[styles.iconButton, statusFilter !== 'ALL' && styles.activeFilter]} 
             onPress={() => setShowFilters(true)}
+            testID="catalog-button-filter"
+            accessibilityLabel="Filter products"
+            accessibilityRole="button"
+            accessible={true}
           >
             <Filter size={20} color={statusFilter !== 'ALL' ? '#fff' : '#0f172a'} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton} onPress={() => setShowSort(true)}>
+          <TouchableOpacity 
+            style={styles.iconButton} 
+            onPress={() => setShowSort(true)}
+            testID="catalog-button-sort"
+            accessibilityLabel="Sort products"
+            accessibilityRole="button"
+            accessible={true}
+          >
             <ArrowUpDown size={20} color="#0f172a" />
           </TouchableOpacity>
           {isAdmin && (
@@ -219,6 +256,10 @@ export default function ProductCatalogScreen() {
                 setEditingProduct(undefined);
                 setFormModalVisible(true);
               }}
+              testID="catalog-button-add-product"
+              accessibilityLabel="Add new product"
+              accessibilityRole="button"
+              accessible={true}
             >
               <Plus size={20} color="#fff" />
             </TouchableOpacity>
@@ -265,6 +306,10 @@ export default function ProductCatalogScreen() {
                   setStatusFilter(status);
                   setShowFilters(false);
                 }}
+                testID={`catalog-filter-option-${status.toLowerCase()}`}
+                accessibilityLabel={`Filter by ${status.replace('_', ' ')}`}
+                accessibilityRole="button"
+                accessible={true}
               >
                 <Text style={[styles.filterText, statusFilter === status && styles.selectedText]}>
                   {status.replace('_', ' ')}
@@ -299,6 +344,10 @@ export default function ProductCatalogScreen() {
                   setSortOrder(option.order as 'ASC' | 'DESC');
                   setShowSort(false);
                 }}
+                testID={`catalog-sort-option-${option.value}-${option.order.toLowerCase()}`}
+                accessibilityLabel={`Sort by ${option.label}`}
+                accessibilityRole="button"
+                accessible={true}
               >
                 <Text style={[
                   styles.filterText, 

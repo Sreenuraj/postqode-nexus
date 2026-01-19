@@ -60,6 +60,9 @@ export default function BuyModal({ visible, onClose, product, onSuccess }: BuyMo
               onChangeText={setQuantity}
               keyboardType="numeric"
               placeholder="1"
+              testID="buy-modal-input-quantity"
+              accessibilityLabel="Quantity input"
+              accessible={true}
             />
             <Text style={styles.total}>
               Total: ${((parseInt(quantity) || 0) * product.price).toFixed(2)}
@@ -67,16 +70,27 @@ export default function BuyModal({ visible, onClose, product, onSuccess }: BuyMo
           </View>
 
           <View style={styles.actions}>
-            <TouchableOpacity style={[styles.button, styles.cancelButton]} onPress={onClose}>
+            <TouchableOpacity 
+              style={[styles.button, styles.cancelButton]} 
+              onPress={onClose}
+              testID="buy-modal-button-cancel"
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
+              accessible={true}
+            >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.button, styles.buyButton]} 
               onPress={handleBuy}
               disabled={loading}
+              testID="buy-modal-button-submit"
+              accessibilityLabel="Place order"
+              accessibilityRole="button"
+              accessible={true}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color="#fff" testID="buy-modal-loading-indicator" />
               ) : (
                 <Text style={styles.buyButtonText}>Place Order</Text>
               )}
