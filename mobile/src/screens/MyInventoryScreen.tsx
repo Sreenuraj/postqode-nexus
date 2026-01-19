@@ -33,7 +33,12 @@ export default function MyInventoryScreen() {
   };
 
   const renderItem = ({ item }: { item: InventoryItem }) => (
-    <View style={styles.card}>
+    <View 
+      style={styles.card}
+      testID={`my-inventory-item-${item.id}`}
+      accessible={true}
+      accessibilityLabel={`Inventory item: ${item.name}, Quantity: ${item.quantity}, Source: ${item.source}`}
+    >
       <View style={styles.cardHeader}>
         <View style={styles.headerLeft}>
           <Text style={styles.itemName}>{item.name}</Text>
@@ -44,7 +49,14 @@ export default function MyInventoryScreen() {
           </View>
         </View>
         <View style={styles.actions}>
-          <TouchableOpacity onPress={() => handleConsume(item)} style={styles.actionButton}>
+          <TouchableOpacity 
+            onPress={() => handleConsume(item)} 
+            style={styles.actionButton}
+            testID={`my-inventory-button-consume-${item.id}`}
+            accessibilityLabel={`Consume ${item.name}`}
+            accessibilityRole="button"
+            accessible={true}
+          >
             <MinusCircle size={20} color="#f59e0b" />
           </TouchableOpacity>
         </View>

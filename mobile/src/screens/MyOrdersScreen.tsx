@@ -60,7 +60,12 @@ export default function MyOrdersScreen() {
   const renderItem = ({ item }: { item: Order }) => {
     const statusStyle = getStatusStyle(item.status);
     return (
-      <View style={styles.card}>
+      <View 
+        style={styles.card}
+        testID={`my-orders-item-${item.id}`}
+        accessible={true}
+        accessibilityLabel={`Order: ${item.product?.name}, Status: ${item.status}, Quantity: ${item.quantity}`}
+      >
         <View style={styles.cardHeader}>
           <Text style={styles.productName}>{item.product?.name || 'Unknown Product'}</Text>
           <View style={[styles.badge, { backgroundColor: statusStyle.backgroundColor }]}>
@@ -73,7 +78,14 @@ export default function MyOrdersScreen() {
           <Text style={styles.detailText}>Total: ${(item.product?.price * item.quantity).toFixed(2)}</Text>
         </View>
         {item.status === 'PENDING' && (
-          <TouchableOpacity onPress={() => handleCancel(item)} style={styles.cancelButton}>
+          <TouchableOpacity 
+            onPress={() => handleCancel(item)} 
+            style={styles.cancelButton}
+            testID={`my-orders-button-cancel-${item.id}`}
+            accessibilityLabel={`Cancel order for ${item.product?.name}`}
+            accessibilityRole="button"
+            accessible={true}
+          >
             <XCircle size={16} color="#64748b" />
             <Text style={styles.cancelText}>Cancel Order</Text>
           </TouchableOpacity>
