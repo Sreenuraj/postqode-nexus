@@ -51,7 +51,12 @@ export default function UsersScreen() {
   };
 
   const renderItem = ({ item }: { item: User }) => (
-    <View style={styles.card}>
+    <View 
+      style={styles.card}
+      testID={`users-item-${item.id}`}
+      accessible={true}
+      accessibilityLabel={`User: ${item.username}, Role: ${item.role}, Status: ${item.enabled !== false ? 'Active' : 'Disabled'}`}
+    >
       <View style={styles.cardHeader}>
         <View style={styles.headerLeft}>
           <Text style={styles.username}>{item.username}</Text>
@@ -61,7 +66,14 @@ export default function UsersScreen() {
             </Text>
           </View>
         </View>
-        <TouchableOpacity onPress={() => handleEdit(item)} style={styles.actionButton}>
+        <TouchableOpacity 
+          onPress={() => handleEdit(item)} 
+          style={styles.actionButton}
+          testID={`users-button-edit-${item.id}`}
+          accessibilityLabel={`Edit ${item.username}`}
+          accessibilityRole="button"
+          accessible={true}
+        >
           <Edit2 size={20} color="#64748b" />
         </TouchableOpacity>
       </View>
@@ -73,6 +85,9 @@ export default function UsersScreen() {
           onValueChange={(value) => handleToggleStatus(item, value)}
           trackColor={{ false: '#cbd5e1', true: '#0f172a' }}
           thumbColor="#fff"
+          testID={`users-switch-status-${item.id}`}
+          accessibilityLabel={`Toggle status for ${item.username}`}
+          accessible={true}
         />
       </View>
     </View>
@@ -81,7 +96,14 @@ export default function UsersScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       <View style={styles.toolbar}>
-        <TouchableOpacity onPress={handleAdd} style={styles.addButton}>
+        <TouchableOpacity 
+          onPress={handleAdd} 
+          style={styles.addButton}
+          testID="users-button-add"
+          accessibilityLabel="Add new user"
+          accessibilityRole="button"
+          accessible={true}
+        >
           <Plus size={24} color="#fff" />
         </TouchableOpacity>
       </View>

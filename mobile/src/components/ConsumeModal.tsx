@@ -55,6 +55,9 @@ export default function ConsumeModal({ visible, onClose, onSave, item }: Consume
             keyboardType="numeric"
             placeholder="Quantity"
             autoFocus
+            testID="consume-modal-input-quantity"
+            accessibilityLabel="Quantity to consume"
+            accessible={true}
           />
 
           <View style={styles.footer}>
@@ -62,6 +65,10 @@ export default function ConsumeModal({ visible, onClose, onSave, item }: Consume
               style={[styles.button, styles.cancelButton]} 
               onPress={onClose}
               disabled={loading}
+              testID="consume-modal-button-cancel"
+              accessibilityLabel="Cancel"
+              accessibilityRole="button"
+              accessible={true}
             >
               <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
@@ -69,6 +76,10 @@ export default function ConsumeModal({ visible, onClose, onSave, item }: Consume
               style={[styles.button, styles.saveButton]} 
               onPress={handleSubmit}
               disabled={loading}
+              testID="consume-modal-button-submit"
+              accessibilityLabel="Consume item"
+              accessibilityRole="button"
+              accessible={true}
             >
               <Text style={[styles.buttonText, styles.saveButtonText]}>
                 {loading ? 'Processing...' : 'Consume'}
