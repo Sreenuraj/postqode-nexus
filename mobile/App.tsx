@@ -29,7 +29,14 @@ function AppNavigator() {
         tabBarActiveTintColor: '#0f172a',
         tabBarInactiveTintColor: '#64748b',
         headerRight: () => (
-          <TouchableOpacity onPress={logout} style={{ marginRight: 16 }}>
+          <TouchableOpacity 
+            onPress={logout} 
+            style={{ marginRight: 16 }}
+            testID="navigation-button-logout"
+            accessibilityLabel="Logout"
+            accessibilityRole="button"
+            accessible={true}
+          >
             <LogOut size={20} color="#ef4444" />
           </TouchableOpacity>
         ),

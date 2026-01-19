@@ -69,6 +69,9 @@ export default function LoginScreen() {
             onChangeText={setUsername}
             autoCapitalize="none"
             autoCorrect={false}
+            testID="login-input-username"
+            accessibilityLabel="Username input"
+            accessible={true}
           />
 
           <Text style={styles.label}>Password</Text>
@@ -81,10 +84,17 @@ export default function LoginScreen() {
               secureTextEntry={!showPassword}
               autoCapitalize="none"
               autoCorrect={false}
+              testID="login-input-password"
+              accessibilityLabel="Password input"
+              accessible={true}
             />
             <TouchableOpacity 
               onPress={() => setShowPassword(!showPassword)}
               style={styles.eyeIcon}
+              testID="login-button-toggle-password"
+              accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+              accessibilityRole="button"
+              accessible={true}
             >
               {showPassword ? (
                 <EyeOff size={20} color="#64748b" />
@@ -98,9 +108,13 @@ export default function LoginScreen() {
             style={styles.button} 
             onPress={handleLogin}
             disabled={loading}
+            testID="login-button-submit"
+            accessibilityLabel="Login button"
+            accessibilityRole="button"
+            accessible={true}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color="#fff" testID="login-loading-indicator" />
             ) : (
               <Text style={styles.buttonText}>Login</Text>
             )}
