@@ -45,7 +45,12 @@ export default function OrderManagementScreen() {
   };
 
   const renderItem = ({ item }: { item: Order }) => (
-    <View style={styles.card}>
+    <View 
+      style={styles.card}
+      testID={`order-mgmt-item-${item.id}`}
+      accessible={true}
+      accessibilityLabel={`Order: ${item.product?.name}, Status: ${item.status}, Quantity: ${item.quantity}`}
+    >
       <View style={styles.cardHeader}>
         <Text style={styles.productName}>{item.product?.name || 'Unknown Product'}</Text>
         <View style={[styles.badge, getStatusStyle(item.status)]}>
@@ -68,6 +73,10 @@ export default function OrderManagementScreen() {
           <TouchableOpacity 
             style={[styles.actionButton, styles.rejectButton]} 
             onPress={() => handleReject(item)}
+            testID={`order-mgmt-button-reject-${item.id}`}
+            accessibilityLabel={`Reject order for ${item.product?.name}`}
+            accessibilityRole="button"
+            accessible={true}
           >
             <X size={16} color="#dc2626" />
             <Text style={[styles.actionText, { color: '#dc2626' }]}>Reject</Text>
@@ -75,6 +84,10 @@ export default function OrderManagementScreen() {
           <TouchableOpacity 
             style={[styles.actionButton, styles.approveButton]} 
             onPress={() => handleApprove(item)}
+            testID={`order-mgmt-button-approve-${item.id}`}
+            accessibilityLabel={`Approve order for ${item.product?.name}`}
+            accessibilityRole="button"
+            accessible={true}
           >
             <Check size={16} color="#16a34a" />
             <Text style={[styles.actionText, { color: '#16a34a' }]}>Approve</Text>

@@ -62,14 +62,33 @@ export default function CategoryScreen() {
   };
 
   const renderItem = ({ item }: { item: Category }) => (
-    <View style={styles.card}>
+    <View 
+      style={styles.card}
+      testID={`categories-item-${item.id}`}
+      accessible={true}
+      accessibilityLabel={`Category: ${item.name}`}
+    >
       <View style={styles.cardHeader}>
         <Text style={styles.categoryName}>{item.name}</Text>
         <View style={styles.actions}>
-          <TouchableOpacity onPress={() => handleEdit(item)} style={styles.actionButton}>
+          <TouchableOpacity 
+            onPress={() => handleEdit(item)} 
+            style={styles.actionButton}
+            testID={`categories-button-edit-${item.id}`}
+            accessibilityLabel={`Edit ${item.name}`}
+            accessibilityRole="button"
+            accessible={true}
+          >
             <Edit2 size={20} color="#64748b" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => handleDelete(item)} style={styles.actionButton}>
+          <TouchableOpacity 
+            onPress={() => handleDelete(item)} 
+            style={styles.actionButton}
+            testID={`categories-button-delete-${item.id}`}
+            accessibilityLabel={`Delete ${item.name}`}
+            accessibilityRole="button"
+            accessible={true}
+          >
             <Trash2 size={20} color="#ef4444" />
           </TouchableOpacity>
         </View>
@@ -81,7 +100,14 @@ export default function CategoryScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
       <View style={styles.toolbar}>
-        <TouchableOpacity onPress={handleAdd} style={styles.addButton}>
+        <TouchableOpacity 
+          onPress={handleAdd} 
+          style={styles.addButton}
+          testID="categories-button-add"
+          accessibilityLabel="Add new category"
+          accessibilityRole="button"
+          accessible={true}
+        >
           <Plus size={24} color="#fff" />
         </TouchableOpacity>
       </View>
