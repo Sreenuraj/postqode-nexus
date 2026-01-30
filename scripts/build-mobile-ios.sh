@@ -56,6 +56,17 @@ fi
 echo -e "${BLUE}⚙️  Running Expo Prebuild...${NC}"
 npx expo prebuild --platform ios --clean
 
+# Remove Push Notifications capability for Personal development teams
+if [ "$BUILD_FOR_DEVICE" = "device" ]; then
+    ENTITLEMENTS_FILE="ios/PostQodeNexus/PostQodeNexus.entitlements"
+    if [ -f "$ENTITLEMENTS_FILE" ]; then
+        echo -e "${YELLOW}🔧 Disabling Push Notifications for Personal development team...${NC}"
+        # Remove aps-environment from entitlements file
+        sed -i '' '/<key>aps-environment<\/key>/,/<string>development<\/string>/d' "$ENTITLEMENTS_FILE"
+        echo -e "${GREEN}✅ Push Notifications capability disabled${NC}"
+    fi
+fi
+
 # Export the app (this creates a standalone bundle)
 echo -e "${BLUE}📦 Exporting app bundle...${NC}"
 npx expo export --platform ios --output-dir .expo-export
