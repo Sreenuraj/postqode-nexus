@@ -78,28 +78,35 @@ This application is **not a production system**, but it must behave like one.
 ### 5.1 Admin User
 - Login access
 - Full product & inventory control
-- Dashboard access
+- Dashboard access with system-wide analytics
 - View analytics and activity trends
+- User management (add, edit, delete users)
+- Category management (add, edit, delete categories)
+- Order management (approve, reject orders)
+- Product CRUD operations
 
 ### 5.2 Standard User
 - Login access
-- View-only catalog
-- Search, sort, filter
-- No modification rights
+- View-only product catalog with buy functionality
+- Search, sort, filter products
+- Personal dashboard with order and inventory metrics
+- My Orders page (view own order history)
+- My Inventory page (personal inventory tracking with consume functionality)
+- No modification rights to system data
 
 ---
 
 ## 6. End-to-End Demo Journey
 
-### Primary Demo Flow
-Login → Product Catalog → Inventory Actions → Dashboard → Logout
+### Admin Demo Flow
+Login → Dashboard → Products → Categories → Users → Order Management → Logout
 
-yaml
-Copy code
+### User Demo Flow
+Login → Dashboard → Products → My Orders → My Inventory → Logout
 
 ### Demo Constraints
-- Max 3–5 screens
-- No optional detours
+- Max 5–7 screens per role
+- Role-specific navigation paths
 - Same flow on Web & Mobile
 - Only approved screens visible during demos
 
@@ -116,20 +123,31 @@ Copy code
 ---
 
 ### 7.2 Product Catalog
-- Product list view
-- Search
-- Sort
-- Filter
-- Pagination
-- Product metadata only (no rich media)
+- **For Admin:**
+  - Product list view with full CRUD actions
+  - Search, sort, filter, pagination
+  - Add Product button
+  - Edit/Delete actions via dropdown menu
+  - Product metadata: SKU, Name, Category, Price, Quantity, Status, Actions
+- **For User:**
+  - Product list view (view-only)
+  - Search, sort, filter, pagination
+  - Buy button for in-stock products
+  - Disabled Buy button for out-of-stock products
+  - Product metadata: SKU, Name, Category, Price, Quantity, Status, Actions
+- Product states:
+  - 🟢 ACTIVE
+  - 🟡 LOW STOCK
+  - 🔴 OUT OF STOCK
 
 ---
 
-### 7.3 Inventory Management
+### 7.3 Inventory Management (Admin Only)
 - Admin-only actions:
   - Add product
   - Update product
   - Change product state
+  - Delete product
 - Product states:
   - Active
   - Low Stock
@@ -138,17 +156,69 @@ Copy code
 
 ---
 
-### 7.4 Dashboard (Admin Only)
-- Metrics driven by real actions:
-  - Products added today
-  - Products by state
-  - Activity by user
-- Graphs update dynamically
-- No static or mocked data
+### 7.4 Dashboard
+- **Admin Dashboard:**
+  - Metrics driven by real actions:
+    - Total Products, Active, Low Stock, Out of Stock counts
+    - Order Overview (Total, Pending, Approved, Rejected)
+    - Products by Status chart
+    - Products Added Today
+    - Activity by User (Last 7 Days)
+    - Recent Activity log
+- **User Dashboard:**
+  - Personal metrics:
+    - My Orders count
+    - Pending Orders
+    - Total Spend
+    - Inventory Items count
+  - Quick actions to My Orders and My Inventory
 
 ---
 
-### 7.5 Logout
+### 7.5 Categories (Admin Only)
+- Category list view
+- Add new category
+- Edit existing category
+- Delete category
+- Category metadata: Name, Description, Created date
+
+---
+
+### 7.6 Users (Admin Only)
+- User list view
+- Add new user
+- Edit existing user
+- Delete user
+- User metadata: Username, Email, Role, Status, Created date
+
+---
+
+### 7.7 Order Management (Admin Only)
+- Order list view with all orders
+- Order actions: Approve, Reject
+- Order metadata: Order ID, User, Product, Quantity, Total, Stock, Status, Created
+- Order statuses: PENDING, APPROVED, REJECTED, CANCELLED
+
+---
+
+### 7.8 My Orders (User Only)
+- Personal order history
+- Order details: Order ID, Product, Quantity, Total, Status, Created
+- Order statuses: PENDING, APPROVED, REJECTED, CANCELLED
+- Cancel pending orders
+
+---
+
+### 7.9 My Inventory (User Only)
+- Personal inventory tracking
+- Inventory items from approved orders
+- Item metadata: Name, Quantity, Source, Added date
+- Consume item functionality
+- Source types: PURCHASED
+
+---
+
+### 7.10 Logout
 - Session termination
 - Token invalidation
 
