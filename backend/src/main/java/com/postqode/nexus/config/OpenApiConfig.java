@@ -41,8 +41,8 @@ public class OpenApiConfig {
                                 .url("http://localhost:8080")
                                 .description("Development Server"),
                         new Server()
-                                .url("https://demo.postqode.com")
-                                .description("Demo Server")))
+                                .url("https://nexus-api.postqode.io")
+                                .description("Production Server")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName,
