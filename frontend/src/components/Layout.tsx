@@ -25,6 +25,7 @@ import {
   LineChart,
   Radar,
   Activity,
+  FilePlus,
 } from 'lucide-react';
 
 export const Layout: React.FC = () => {
@@ -50,6 +51,7 @@ export const Layout: React.FC = () => {
     { path: '/my-orders', label: 'My Orders', icon: ShoppingCart, show: !isAdmin },
     { path: '/my-inventory', label: 'My Inventory', icon: Box, show: !isAdmin },
     { path: '/my-activity', label: 'My Activity', icon: Activity, show: !isAdmin },
+    { path: '/product-request', label: 'Request Product', icon: FilePlus, show: !isAdmin },
   ];
 
   return (

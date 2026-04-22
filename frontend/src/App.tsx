@@ -14,6 +14,7 @@ import { MyInventoryPage } from './pages/MyInventoryPage';
 import { InsightsPage } from './pages/InsightsPage';
 import { CommandCenterPage } from './pages/CommandCenterPage';
 import { MyActivityPage } from './pages/MyActivityPage';
+import { ProductRequestWizardPage } from './pages/ProductRequestWizardPage';
 
 function App() {
   return (
@@ -103,6 +104,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <MyActivityPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="product-request"
+              element={
+                <ProtectedRoute>
+                  <ProductRequestWizardPage />
                 </ProtectedRoute>
               }
             />
