@@ -1,7 +1,17 @@
 package com.postqode.nexus.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.postqode.nexus.dto.*;
+import com.postqode.nexus.model.User;
+import com.postqode.nexus.model.UserPreferences;
+import com.postqode.nexus.repository.UserPreferencesRepository;
+import com.postqode.nexus.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
@@ -9,6 +19,15 @@ import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class PreferencesService {
+
+    @Autowired
+    private UserPreferencesRepository userPreferencesRepository;
+    
+    @Autowired
+    private UserRepository userRepository;
+    
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private static final Map<String, List<String>> LABEL_POOLS = new HashMap<>();
     
@@ -45,6 +64,26 @@ public class PreferencesService {
         
         List<PreferencesFieldMetadata> fields = buildFieldsForProfile(profile);
         
+        // Load saved preferences and populate default values
+        User currentUser = getCurrentUser();
+        if (currentUser != null) {
+            Optional<UserPreferences> savedPrefs = userPreferencesRepository.findByUserAndProfile(currentUser, profile);
+            if (savedPrefs.isPresent()) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> savedValues = objectMapper.readValue(savedPrefs.get().getPreferencesJson(), Map.class);
+                    // Update field default values with saved data
+                    for (PreferencesFieldMetadata field : fields) {
+                        if (savedValues.containsKey(field.getLogicalKey())) {
+                            field.setDefaultValue(String.valueOf(savedValues.get(field.getLogicalKey())));
+                        }
+                    }
+                } catch (JsonProcessingException e) {
+                    // Ignore parse errors, use defaults
+                }
+            }
+        }
+        
         return new PreferencesMetadataResponse(
             formId,
             title,
@@ -56,6 +95,7 @@ public class PreferencesService {
         );
     }
 
+    @Transactional
     public PreferencesSubmitResponse submitPreferences(PreferencesSubmitRequest request) {
         // Validate profile
         if (!Arrays.asList("personal", "work", "notifications", "localization").contains(request.getProfile())) {
@@ -68,6 +108,31 @@ public class PreferencesService {
             Thread.sleep(latency);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+        }
+        
+        // Persist preferences
+        User currentUser = getCurrentUser();
+        if (currentUser != null) {
+            try {
+                String preferencesJson = objectMapper.writeValueAsString(request.getValues());
+                
+                Optional<UserPreferences> existing = userPreferencesRepository.findByUserAndProfile(currentUser, request.getProfile());
+                UserPreferences prefs;
+                
+                if (existing.isPresent()) {
+                    prefs = existing.get();
+                    prefs.setPreferencesJson(preferencesJson);
+                } else {
+                    prefs = new UserPreferences();
+                    prefs.setUser(currentUser);
+                    prefs.setProfile(request.getProfile());
+                    prefs.setPreferencesJson(preferencesJson);
+                }
+                
+                userPreferencesRepository.save(prefs);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("Failed to serialize preferences", e);
+            }
         }
         
         return new PreferencesSubmitResponse(true, Instant.now(), "Preferences saved.");
@@ -224,5 +289,14 @@ public class PreferencesService {
             options,
             dependsOn
         );
+    }
+    
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        String username = authentication.getName();
+        return userRepository.findByUsername(username).orElse(null);
     }
 }
