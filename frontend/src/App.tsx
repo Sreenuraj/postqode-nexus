@@ -15,6 +15,7 @@ import { InsightsPage } from './pages/InsightsPage';
 import { CommandCenterPage } from './pages/CommandCenterPage';
 import { MyActivityPage } from './pages/MyActivityPage';
 import { ProductRequestWizardPage } from './pages/ProductRequestWizardPage';
+import { PreferencesPage } from './pages/PreferencesPage';
 
 function App() {
   return (
@@ -112,6 +113,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ProductRequestWizardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="preferences"
+              element={
+                <ProtectedRoute>
+                  <PreferencesPage />
                 </ProtectedRoute>
               }
             />

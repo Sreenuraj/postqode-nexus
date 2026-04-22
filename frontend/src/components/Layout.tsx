@@ -26,6 +26,7 @@ import {
   Radar,
   Activity,
   FilePlus,
+  UserCog,
 } from 'lucide-react';
 
 export const Layout: React.FC = () => {
@@ -52,6 +53,7 @@ export const Layout: React.FC = () => {
     { path: '/my-inventory', label: 'My Inventory', icon: Box, show: !isAdmin },
     { path: '/my-activity', label: 'My Activity', icon: Activity, show: !isAdmin },
     { path: '/product-request', label: 'Request Product', icon: FilePlus, show: !isAdmin },
+    { path: '/preferences', label: 'Preferences', icon: UserCog, show: true },
   ];
 
   return (

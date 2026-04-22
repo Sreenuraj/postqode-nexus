@@ -381,3 +381,15 @@ export const productRequestApi = {
     };
   },
 };
+
+// Preferences API
+export const preferencesApi = {
+  getMetadata: async (profile: string) => {
+    const response = await api.get('/preferences/metadata', { params: { profile } });
+    return response.data;
+  },
+  submit: async (payload: any) => {
+    const response = await api.post('/preferences', payload);
+    return response.data;
+  },
+};
