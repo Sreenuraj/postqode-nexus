@@ -11,6 +11,9 @@ import { UsersPage } from './pages/UsersPage';
 import { MyOrdersPage } from './pages/MyOrdersPage';
 import { OrderManagementPage } from './pages/OrderManagementPage';
 import { MyInventoryPage } from './pages/MyInventoryPage';
+import { InsightsPage } from './pages/InsightsPage';
+import { CommandCenterPage } from './pages/CommandCenterPage';
+import { MyActivityPage } from './pages/MyActivityPage';
 
 function App() {
   return (
@@ -76,6 +79,30 @@ function App() {
               element={
                 <ProtectedRoute>
                   <DashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="insights"
+              element={
+                <ProtectedRoute>
+                  <InsightsPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="command-center"
+              element={
+                <ProtectedRoute requireAdmin>
+                  <CommandCenterPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="my-activity"
+              element={
+                <ProtectedRoute>
+                  <MyActivityPage />
                 </ProtectedRoute>
               }
             />

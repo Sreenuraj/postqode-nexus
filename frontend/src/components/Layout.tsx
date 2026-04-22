@@ -21,7 +21,10 @@ import {
   Users,
   ShoppingCart,
   ClipboardList,
-  Box
+  Box,
+  LineChart,
+  Radar,
+  Activity,
 } from 'lucide-react';
 
 export const Layout: React.FC = () => {
@@ -38,12 +41,15 @@ export const Layout: React.FC = () => {
 
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, show: true },
+    { path: '/insights', label: 'Insights', icon: LineChart, show: true },
     { path: '/products', label: 'Products', icon: Package, show: true },
     { path: '/categories', label: 'Categories', icon: Tag, show: isAdmin },
     { path: '/users', label: 'Users', icon: Users, show: isAdmin },
     { path: '/orders', label: 'Order Management', icon: ClipboardList, show: isAdmin },
+    { path: '/command-center', label: 'Command Center', icon: Radar, show: isAdmin },
     { path: '/my-orders', label: 'My Orders', icon: ShoppingCart, show: !isAdmin },
     { path: '/my-inventory', label: 'My Inventory', icon: Box, show: !isAdmin },
+    { path: '/my-activity', label: 'My Activity', icon: Activity, show: !isAdmin },
   ];
 
   return (
