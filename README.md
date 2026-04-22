@@ -98,9 +98,39 @@ postqode-nexus/
 
 # Start Mobile App
 ./scripts/start-mobile.sh
+```
 
-# Or using Docker Compose
-docker-compose up -d
+### Using Docker Compose
+
+The compose file lives in the `docker/` directory (not the project root), so you
+must either `cd` into it or pass it explicitly with `-f`. Running a bare
+`docker-compose up -d` from the project root will fail with
+`no configuration file provided: not found`.
+
+```bash
+# Option 1 — run from the docker/ directory
+cd docker
+docker-compose up -d        # starts db + backend + frontend
+
+# Option 2 — from the project root, point at the compose file
+docker-compose -f docker/docker-compose.yml up -d
+
+# Stop everything
+docker-compose -f docker/docker-compose.yml down
+```
+
+This brings up all three services:
+
+| Service  | Container        | Port (host) |
+|----------|------------------|-------------|
+| Database | `nexus-db`       | `5432`      |
+| Backend  | `nexus-backend`  | `8080`      |
+| Frontend | `nexus-frontend` | `3000`      |
+
+Verify everything is running:
+
+```bash
+docker-compose -f docker/docker-compose.yml ps
 ```
 
 ## 🔑 Demo Credentials
