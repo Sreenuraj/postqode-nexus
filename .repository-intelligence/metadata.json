@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "last_updated": "2026-11-06T14:09:00+05:30",
+  "last_validated": "2026-11-06T14:09:00+05:30",
+  "repository_type": "fullstack-demo",
+  "framework": "Spring Boot + React + React Native",
+  "file_count": 150,
+  "test_count": 0,
+  "phase": "quick",
+  "health": {
+    "coverage_pct": 0,
+    "pattern_coverage_pct": 0,
+    "component_coverage_pct": 0,
+    "domain_coverage_pct": 0,
+    "confidence_score": 0
+  },
+  "artifact_freshness": {
+    "repository-overview.md": "2026-11-06T14:09:00+05:30",
+    "framework-summary.md": "2026-11-06T14:09:00+05:30"
+  }
+}
