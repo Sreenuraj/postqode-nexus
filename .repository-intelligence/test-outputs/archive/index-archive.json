@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "last_updated": "2026-08-11T00:00:00Z",
+  "batches": {
+    "batch-001": {
+      "area": "Auth",
+      "source_doc": "docs/e2e-test-cases.md",
+      "created": "2026-08-11T00:00:00Z",
+      "status": "archived",
+      "test_ids": ["AUTH-E2E-001", "AUTH-E2E-002", "AUTH-E2E-003", "AUTH-E2E-004"],
+      "buildable": [],
+      "blocked": [],
+      "implemented": ["AUTH-E2E-001", "AUTH-E2E-002", "AUTH-E2E-003", "AUTH-E2E-004"],
+      "path": "archive/Auth/batch-001"
+    }
+  },
+  "test_index": {
+    "AUTH-E2E-001": {"batch": "batch-001", "status": "archived", "area": "Auth"},
+    "AUTH-E2E-002": {"batch": "batch-001", "status": "archived", "area": "Auth"},
+    "AUTH-E2E-003": {"batch": "batch-001", "status": "archived", "area": "Auth"},
+    "AUTH-E2E-004": {"batch": "batch-001", "status": "archived", "area": "Auth"}
+  }
+}

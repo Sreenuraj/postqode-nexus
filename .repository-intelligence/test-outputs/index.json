@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "last_updated": "2026-08-11T00:00:00Z",
+  "next_batch_id": 2,
+  "batches": {},
+  "test_index": {
+    "AUTH-E2E-005": {"batch": null, "status": "buildable", "area": "Auth", "note": "Live-verified via brain/scripts/verify_auth.py; not yet added as its own Gherkin scenario"}
+  }
+}

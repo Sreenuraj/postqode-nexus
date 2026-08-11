@@ -1,21 +1,28 @@
 {
   "version": 1,
-  "last_updated": "2026-11-06T14:09:00+05:30",
-  "last_validated": "2026-11-06T14:09:00+05:30",
-  "repository_type": "fullstack-demo",
-  "framework": "Spring Boot + React + React Native",
-  "file_count": 150,
-  "test_count": 0,
-  "phase": "quick",
+  "phase": "progressive",
+  "last_updated": "2026-08-11T00:00:00Z",
+  "last_validated": "2026-08-11T00:00:00Z",
+  "domain": "inventory-and-order-management-demo-app",
+  "framework": "playwright-python-behave",
   "health": {
-    "coverage_pct": 0,
-    "pattern_coverage_pct": 0,
-    "component_coverage_pct": 0,
-    "domain_coverage_pct": 0,
-    "confidence_score": 0
+    "coverage_pct": 15,
+    "pattern_coverage_pct": 20,
+    "component_coverage_pct": 10,
+    "domain_coverage_pct": 20,
+    "confidence_score": 0.5
   },
   "artifact_freshness": {
-    "repository-overview.md": "2026-11-06T14:09:00+05:30",
-    "framework-summary.md": "2026-11-06T14:09:00+05:30"
-  }
+    "repository-overview.md": "2026-08-11T00:00:00Z",
+    "framework-summary.md": "2026-08-11T00:00:00Z",
+    "functional-map/index.md": "2026-08-11T00:00:00Z",
+    "functional-map/auth.md": "2026-08-11T00:00:00Z",
+    "domain-summary.md": "2026-08-11T00:00:00Z",
+    "glossary.md": "2026-08-11T00:00:00Z",
+    "component-catalog/auth.md": "2026-08-11T00:00:00Z",
+    "pattern-catalog.md": "2026-08-11T00:00:00Z",
+    "test-catalog.md": "2026-08-11T00:00:00Z",
+    "task-resolver.md": "2026-08-11T00:00:00Z"
+  },
+  "notes": []
 }

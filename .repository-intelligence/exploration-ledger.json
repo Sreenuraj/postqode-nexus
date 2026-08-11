@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "last_updated": "2026-08-11T00:00:00Z",
+  "scripts": {
+    "brain/scripts/verify_auth.py": {
+      "areas": ["Auth"],
+      "does": "Verifies login/logout/RBAC locators and flows against http://localhost:3000",
+      "selectors_verified": [
+        "#login-input-username",
+        "#login-input-password",
+        "role=button[name='Sign In']",
+        "button[aria-haspopup='menu']",
+        "role=menuitem[name='Logout']",
+        "role=link[name=<nav label>] (8 admin + 8 user labels)"
+      ],
+      "flows_verified": [
+        "admin login redirects to /dashboard",
+        "user login redirects to /dashboard",
+        "logout redirects to /login",
+        "invalid login stays on /login with no visible error UI (app finding)",
+        "unauthenticated /products redirects to /login"
+      ],
+      "linked_page_objects": [
+        "automation/pages/login_page.py::LoginPage",
+        "automation/pages/dashboard_page.py::DashboardPage",
+        "automation/pages/base_page.py::BasePage"
+      ],
+      "last_used": "2026-08-11T00:00:00Z"
+    }
+  },
+  "routes": {
+    "/login": "public",
+    "/dashboard": "authenticated",
+    "/products": "authenticated"
+  },
+  "discoveries": [
+    "docs/e2e-test-cases.md Appendix A documents login inputs as data-testid, but the app implements them as plain id attributes with matching string values — no data-testid rendered anywhere on the login page.",
+    "Invalid login shows NO visible error/toast/alert; the Sign In button flashes 'Signing in...' then silently reverts to 'Sign In'. Documented app-behavior finding vs. AUTH-E2E-003's expected 'Error message shown'.",
+    "Toast text can also appear as a page heading (e.g. 'Welcome back, user!' in dashboard main content), causing Playwright strict-mode violations unless the toast lookup is scoped to the aria-label='Notifications...' region."
+  ]
+}

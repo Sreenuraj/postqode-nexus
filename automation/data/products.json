@@ -1,0 +1,10 @@
+{
+  "sample_active_product": {
+    "sku": "E2E-SAMPLE-001",
+    "name": "E2E Sample Product",
+    "description": "Created by automation for E2E fixture purposes",
+    "price": 49.99,
+    "quantity": 100,
+    "status": "ACTIVE"
+  }
+}

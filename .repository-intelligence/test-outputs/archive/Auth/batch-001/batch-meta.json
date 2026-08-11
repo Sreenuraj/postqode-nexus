@@ -1,0 +1,23 @@
+{
+  "batch_id": "batch-001",
+  "area": "Auth",
+  "source_doc": "docs/e2e-test-cases.md",
+  "created": "2026-08-11T00:00:00Z",
+  "last_updated": "2026-08-11T00:00:00Z",
+  "status": "archived",
+  "test_ids": ["AUTH-E2E-001", "AUTH-E2E-002", "AUTH-E2E-003", "AUTH-E2E-004"],
+  "buildable_ids": [],
+  "blocked_ids": [],
+  "implemented_ids": ["AUTH-E2E-001", "AUTH-E2E-002", "AUTH-E2E-003", "AUTH-E2E-004"],
+  "run_verified": {
+    "status": "success",
+    "date": "2026-08-11T00:00:00Z",
+    "command": "behave features/auth --tags=@AUTH-E2E-001,@AUTH-E2E-002,@AUTH-E2E-003,@AUTH-E2E-004 -f plain",
+    "scenarios_passed": ["AUTH-E2E-001", "AUTH-E2E-002", "AUTH-E2E-003", "AUTH-E2E-004"],
+    "scenarios_failed": []
+  },
+  "code_review": {
+    "status": "success",
+    "date": "2026-08-11T00:00:00Z"
+  }
+}

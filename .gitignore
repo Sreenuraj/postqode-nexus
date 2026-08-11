@@ -44,3 +44,8 @@ coverage/
 docs/insight_CC_myactivity.md
 docs/request_product.md
 docs/preferences_reference.md
+
+# PostQode automation (Playwright + Python)
+automation/.venv/
+automation/reports/
+brain/screenshots/
