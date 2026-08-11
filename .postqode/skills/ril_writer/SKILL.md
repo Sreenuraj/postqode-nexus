@@ -14,8 +14,10 @@ description: "Writes discovered/verified locators, flows, and fixtures back to t
 - `.repository-intelligence/metadata.json`
 
 ## References
-- `references/ril-write-rules.md`
-- `references/sanitization-rules.md`
+_(read on-demand — only when a capability below cites it, never pre-loaded)_
+- `references/ril-write-rules.md` — needed for Capabilities 1–4 (general write conventions)
+- `references/sanitization-rules.md` — needed for Capability 6 (Sanitized Writing)
+
 
 ## Key Capabilities
 

@@ -14,9 +14,11 @@ Implements the automation code strictly from the approved `plan.md` — it trust
 - Existing `automation/pages/*.py`, `automation/features/steps/*.py`
 
 ## References
-- `references/code-conventions.md`
-- `../../rules/batch-schema.md`
-- `../../rules/automation-framework.md`
+_(read on-demand — only when a capability below cites it, never pre-loaded)_
+- `references/code-conventions.md` — needed for Capability 1 (Code Generation)
+- `../../rules/batch-schema.md` — needed for Capability 3 (Autonomous Run — writing `run_verified`)
+- `../../rules/automation-framework.md` — needed for Capability 1 (POM/BDD conventions to follow)
+
 
 ## Key Capabilities
 

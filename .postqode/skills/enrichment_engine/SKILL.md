@@ -14,9 +14,11 @@ Plans the automation context for a batch: what Gherkin scenarios look like, whic
 - Existing `automation/pages/*.py`, `automation/features/steps/*.py`, `automation/features/<area>/*.feature`
 
 ## References
-- `references/plan-template.md`
-- `../../rules/fixture-api-rules.md`
-- `../../rules/automation-framework.md`
+_(read on-demand — only when a capability below cites it, never pre-loaded)_
+- `references/plan-template.md` — needed for Capability 2 (Draft Checkpoint Save)
+- `../../rules/fixture-api-rules.md` — needed for Capability 1 (Fixture planning)
+- `../../rules/automation-framework.md` — needed for Capability 1 (data-driven planning)
+
 
 ## Key Capabilities
 

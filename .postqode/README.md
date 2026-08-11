@@ -4,9 +4,12 @@ Quick reference for the `.postqode` orchestration engine in this repository. Aut
 
 No Jira, Xray, Confluence, Oracle, or Java/Maven anywhere in this system.
 
+**Rules are loaded just-in-time (JIT), never ambient.** No file under `.postqode/rules/` is preloaded at session start or "always on." Every workflow phase and every skill capability that needs a rule cites its exact relative path right where it's needed (e.g. "per `.postqode/rules/fixture-api-rules.md`"), and that file is read only at that point — not before. See `.postqode/rules/general-conventions.md §0` for the full protocol. This keeps context lean and makes it obvious which rule governs which decision.
+
 ---
 
 ## 1. System Overview
+
 
 - **Repository Intelligence Layer (RIL):** `.repository-intelligence/` — a knowledge base mapping functional areas to verified locators/flows/patterns, bootstrapped from `docs/*.md` (already Markdown — no parsing step needed).
 - **PostQode Engine:** `.postqode/workflows/` + `.postqode/rules/` + `.postqode/skills/` — 2 orchestrator workflows delegating to 10 skills.
@@ -119,3 +122,9 @@ Mode E — delegates to `batch_cleanup`.
 automation/                  # Playwright + Python + behave project
 brain/scripts/                # mandatory live-verification scripts (Architect-owned)
 ```
+
+## 7. Rule Loading Policy (JIT, not ambient)
+Every rule file under `.postqode/rules/` is read on-demand only:
+- Each workflow phase in `01-build-knowledge-base.md` / `02-plan-and-automate.md` cites the exact rule(s) it needs inline, at that phase — not in a blanket "rules loaded" list.
+- Each skill's `## References` section marks every entry with *which capability* needs it, and says explicitly to read on-demand only.
+- No rule is assumed to already be "in context" from a previous phase or a prior conversation turn — re-read the cited section when a new phase/capability needs it.

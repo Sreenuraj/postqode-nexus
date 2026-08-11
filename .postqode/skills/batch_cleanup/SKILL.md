@@ -11,8 +11,10 @@ description: "Redoes/deletes batches, scans for orphaned files, and reconciles t
 - `.repository-intelligence/test-catalog.md`
 
 ## References
-- `references/cleanup-rules.md`
-- `references/reconciliation-rules.md`
+_(read on-demand — only when a capability below cites it, never pre-loaded)_
+- `references/cleanup-rules.md` — needed for Capability 1 (Redo)
+- `references/reconciliation-rules.md` — needed for Capability 3 (Index Reconciliation)
+
 
 ## Key Capabilities
 

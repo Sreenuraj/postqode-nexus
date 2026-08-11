@@ -14,8 +14,10 @@ This is the most important behavioral change from the source system: verificatio
 - `automation/.env` (or a local equivalent) for demo credentials
 
 ## References
-- `references/script-template.py`
-- `references/exploration-ledger-schema.md`
+_(read on-demand — only when a capability below cites it, never pre-loaded)_
+- `references/script-template.py` — needed for Capability 1 (writing a new verify_<area>.py)
+- `references/exploration-ledger-schema.md` — needed for Capability 6 (Ledger Registration)
+
 
 ## Key Capabilities
 

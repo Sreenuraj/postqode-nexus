@@ -16,7 +16,9 @@ Handles ingestion and triage of test cases from the local Markdown doc corpus. N
 - `.repository-intelligence/test-outputs/archive/index-archive.json`
 
 ## References
-- `../../rules/batch-schema.md`
+_(read on-demand — only when a capability below cites it, never pre-loaded)_
+- `../../rules/batch-schema.md` — needed for Capability 5 (Active Batch Triage & Merging)
+
 
 ## Key Capabilities
 

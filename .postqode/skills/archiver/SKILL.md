@@ -10,7 +10,9 @@ description: "Archives fully implemented batches. Moves the batch folder to arch
 - `.repository-intelligence/test-outputs/archive/index-archive.json`
 
 ## References
-- `../../rules/batch-schema.md`
+_(read on-demand — only when a capability below cites it, never pre-loaded)_
+- `../../rules/batch-schema.md` — needed for Capability 1 (Verification — hard preconditions)
+
 
 ## Key Capabilities
 

@@ -2,7 +2,15 @@
 
 This file defines the universal conventions every `.postqode` workflow and skill must follow in this repository. It is a from-scratch rewrite for a Playwright + Python + behave stack — there is no Java, Maven, Jira, Xray, Confluence, or Oracle anywhere in this system.
 
+## 0. Just-In-Time (JIT) Rule Loading Protocol (Mandatory)
+- **No rule is ever pre-loaded or "always on."** Nothing in `.postqode/rules/` should be treated as ambient context loaded at session/conversation start. Every rule file is read **only** at the exact point a workflow phase or skill capability names it as needed — not before, not "just in case."
+- **Workflows and skills must cite the exact file path at the point of need.** Every workflow phase and every skill capability that depends on a rule must name that rule's relative path inline (e.g. "per `.postqode/rules/fixture-api-rules.md`") right next to the instruction that needs it — never as a blanket "these rules apply to this whole file" list disconnected from where they're actually used.
+- **Read before acting, not before starting.** When a workflow phase or skill step is reached and it cites a rule file, read that specific file at that moment (if not already read this session), apply it, then proceed. Do not read rule files for phases/capabilities you haven't reached yet.
+- **This file itself is no exception.** `general-conventions.md` is loaded only when a workflow/skill step explicitly cites it (e.g. "per `general-conventions.md §4`") — never assumed to be in context by default.
+- **Violation:** A workflow or skill file that lists rule files in a header/preamble as "loaded" for the entire file, without tying each one to the specific phase/capability that needs it, must be corrected to cite them inline at point of use instead.
+
 ## 1. RIL Operating Contract & Context Boundaries
+
 - **Lessons-Learned Guardrail:** Obey `.postqode/rules/lessons-learned.md` before declaring blockers, writing verification scripts, or starting live browser checks. The anti-tunnel-vision checkpoint (§6 of that file) is mandatory at every phase boundary and blocker/escalation point.
 - **Strict Boundary:** Load only the specific functional area's `functional-map/<area>.md` and `component-catalog/<area>.md` pointed to by `task-resolver.md`. Never scan the entire `.repository-intelligence/` directory for a single-area task.
 - **Write-back is mandatory:** Persist newly discovered/verified locators, flows, and rules to the RIL before concluding a batch.

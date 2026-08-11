@@ -13,7 +13,9 @@ Ensures a verified precondition (a product in a known state, a PENDING order, an
 - `automation/api_clients/*.py`
 
 ## References
-- `../../rules/fixture-api-rules.md`
+_(read on-demand — only when a capability below cites it, never pre-loaded)_
+- `../../rules/fixture-api-rules.md` — needed for Capability 2 (API-First Creation)
+
 
 ## Key Capabilities
 

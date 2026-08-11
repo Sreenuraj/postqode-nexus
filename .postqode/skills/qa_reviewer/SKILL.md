@@ -12,8 +12,10 @@ Runs the two review gates in `02-plan-and-automate.md`: Phase 5 (plan review) an
 - `docs/e2e-test-cases.md` (+ companions) for the original manual steps
 
 ## References
-- `references/review-checklist.md`
-- `../../rules/batch-schema.md`
+_(read on-demand — only when a capability below cites it, never pre-loaded)_
+- `references/review-checklist.md` — quick-reference checklist for Capabilities 1 and 2
+- `../../rules/batch-schema.md` — needed for Capability 2 (writing `code_review` into `batch-meta.json`)
+
 
 ## Key Capabilities
 

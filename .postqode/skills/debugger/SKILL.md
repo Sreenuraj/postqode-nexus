@@ -14,11 +14,13 @@ Structured, counter-driven troubleshooting when `behave` reports failures. Preve
 - `behave` failure output / Playwright trace-on-failure artifacts (if enabled)
 
 ## References
-- `../../rules/lessons-learned.md`
-- `../../rules/general-conventions.md`
-- `../code_generator/SKILL.md`
-- `../live_explorer/SKILL.md`
-- `../qa_reviewer/SKILL.md`
+_(read on-demand — only when a capability below cites it, never pre-loaded)_
+- `../../rules/lessons-learned.md` — needed at Level 1 (Local Triage) before applying any fix
+- `../../rules/general-conventions.md` — needed for Capability 5 (Rules Compliance, e.g. §11 additive-only, §13 DB safety)
+- `../code_generator/SKILL.md` — needed if handing a fix back for regeneration
+- `../live_explorer/SKILL.md` — needed at Level 1 when re-running `verify_<area>.py`
+- `../qa_reviewer/SKILL.md` — needed for Capability 3 (Pre-Execution QA Gate)
+
 
 ## Key Capabilities
 

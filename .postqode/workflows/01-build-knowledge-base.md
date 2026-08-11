@@ -6,6 +6,9 @@ Build/update the Repository Intelligence Layer (RIL) at `.repository-intelligenc
 
 This workflow is a **thin orchestrator**. It does not contain parsing/extraction procedures itself — those live in the skills it invokes.
 
+**Rule loading is just-in-time (JIT), never ambient.** No rule file is pre-loaded for this workflow. Each phase below cites the exact rule/reference file it needs, read only at that point — see `.postqode/rules/general-conventions.md §0` for the full protocol (read that section only when this note sends you there).
+
+
 ## Input
 The existing local Markdown docs — no parsing/conversion step needed, they're already Markdown:
 - `docs/e2e-test-cases.md` (master E2E catalogue)
@@ -42,9 +45,10 @@ The existing local Markdown docs — no parsing/conversion step needed, they're 
 - Invoke `ril_writer` capability "Write Task Resolver" to produce `.repository-intelligence/task-resolver.md` mapping each functional area → its functional-map file, component-catalog file, and relevant pattern names.
 
 ## Phase 6 — Validate & Finalize
-- **[Persona Activation] Activating QA Reviewer Persona**
+- **[Persona Activation] Activating QA Reviewer Persona** — persona-logging rule cited in `.postqode/rules/general-conventions.md §9`, read only when reached.
 - Invoke `qa_reviewer` capability "RIL Self-Test": pick one real Test ID (e.g. `USR-E2E-002`) and confirm it can be fully understood using only the RIL (no re-reading `docs/`). If not, fix the gap.
 - Update `metadata.json` (`last_updated`, `last_validated`, `phase: "progressive"`).
+
 
 ## Completion Criteria
 - [ ] `functional-map/` has an entry for every area in the nav map
