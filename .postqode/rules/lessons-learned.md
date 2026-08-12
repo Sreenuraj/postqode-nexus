@@ -52,3 +52,12 @@ If the same control fails 2–3 times with small variations of the same fix, sto
 - Hardcoding a demo credential string in a step file instead of loading it via `utils/config.py`.
 - Writing direct SQL `INSERT`/`UPDATE` in a verification script "just this once" instead of using the REST API.
 - Marking a batch `all_implemented` in `index.json` without a real `behave` run confirming `run_verified.status === "success"`.
+
+## 13. Terminal Commands Must Be Self-Terminating (No Interactive/Paged Commands)
+**Read this section before issuing the first `execute_command` call of any session/task** — this is the one exception to the JIT rule-loading protocol (`general-conventions.md §0`); terminal safety is cross-cutting, not phase-specific, and must not wait for a workflow phase to cite it.
+
+The integrated terminal runs inside the chat tool loop — there is no way to send follow-up keystrokes (`q`, `Ctrl+C`, arrow keys, interactive prompts) to a command after it starts. Every `execute_command` call MUST run to completion and exit on its own without any human/agent interaction. Concretely:
+- **Never invoke a pager.** Any command that can page (`git log`, `git diff`, `git show`, `less`, `man`, etc.) must be piped through `cat` or passed a flag that disables paging: `git --no-pager log`, `git -c core.pager=cat diff`, `| cat`, or add `--no-pager` globally for that invocation.
+- **Never rely on sending `q`, `Ctrl+C`, or any key to a running process.** If a command might drop into an interactive/pager/REPL mode, prevent it up front (flags, env vars, redirecting stdin from `/dev/null` if needed) rather than trying to exit it after the fact.
+- **Avoid long-running/blocking commands without a bound.** Dev servers, watchers, or `tail -f` must be started with `requires_approval:false` only when appropriate, and should be checked against "Actively Running Terminals" first — don't start a second blocking process you'll then be stuck unable to stop interactively. Prefer checking logs with a bounded read (`tail -n 50 file.log`) over an unbounded follow.
+- **If a previous command left a terminal apparently hung (e.g. a pager waiting for input), do not try to "fix" it by sending more keystrokes as a new `execute_command` call** — those are new, independent invocations, not input to the stuck process. Instead, use a fresh, corrected, self-terminating command (or a non-terminal tool like `read_file`/`list_files`) to get the same information.
