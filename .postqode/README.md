@@ -42,7 +42,7 @@ Workflow files are **thin orchestrators** — each phase just names the skill in
 
 1. `test_case_parser` — parses `docs/e2e-test-cases.md` (+ companions) directly, triages batches, detects pre-existing automation via `@<TEST-ID>` tags.
 2. `enrichment_engine` — static enrichment from RIL/existing code, drafts and finalizes `plan.md`.
-3. `live_explorer` — **mandatory**, Architect-owned. Runs Playwright+Python scripts to verify every locator/flow live, every batch, regardless of Appendix A.
+3. `live_explorer` — **mandatory**, Architect-owned. Performs live exploration and verification of every locator/flow using browser tools (`postqode_browser_agent` / live browser interaction) and Playwright+Python scripts for every batch, regardless of Appendix A.
 4. `fixture_resolver` — API-first fixture setup against the Nexus REST API, registry in `reusable-fixtures.json`.
 5. `code_generator` — generates `behave` feature files, step defs, Playwright POM page objects, data files; runs `behave` autonomously.
 6. `qa_reviewer` — plan review (incl. Live-Verification Evidence Audit) and code review (incl. POM/data-driven compliance).
@@ -77,7 +77,7 @@ See `.postqode/rules/automation-framework.md` for full conventions.
 ```
 "Automate AUTH-E2E-001 through AUTH-E2E-005"
 ```
-This triggers `02-plan-and-automate.md` Mode A: ingest → plan → mandatory Playwright verification → plan finalize → QA review → codegen → `behave` run (autonomous) → debug loop if needed → code review → RIL write-back → archive.
+This triggers `02-plan-and-automate.md` Mode A: ingest → plan → mandatory live exploration & Playwright verification → plan finalize → QA review → codegen → `behave` run (autonomous) → debug loop if needed → code review → RIL write-back → archive.
 
 ```
 "Answers for batch-001: 1. ..."

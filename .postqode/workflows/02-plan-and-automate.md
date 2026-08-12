@@ -2,7 +2,7 @@
 **Location:** `.postqode/workflows/02-plan-and-automate.md`
 
 ## Purpose
-Single orchestrated pipeline that takes Test IDs from `docs/e2e-test-cases.md` (or its companion docs) all the way to a passing, archived `behave` batch: ingest → plan → **mandatory live verification** → review → generate Playwright/Python code → run autonomously → debug → review → write back → archive.
+Single orchestrated pipeline that takes Test IDs from `docs/e2e-test-cases.md` (or its companion docs) all the way to a passing, archived `behave` batch: ingest → plan → **mandatory live exploration & verification** → review → generate Playwright/Python code → run autonomously → debug → review → write back → archive.
 
 This workflow replaces the source system's separate WF2 (Enrich & Plan) and WF3 (Implement) — this project's scope doesn't need two long, separately-gated phases. Every quality gate from the source system is preserved as an explicit phase below; nothing is skipped, just co-located in one workflow.
 
@@ -31,8 +31,8 @@ This workflow replaces the source system's separate WF2 (Enrich & Plan) and WF3 
 - **Rules needed at this phase:** read `.postqode/rules/general-conventions.md §3` (RIL-First Search Policy) and `.postqode/rules/general-conventions.md §1` (RIL Operating Contract — load only the relevant area's functional-map/component-catalog, not the whole RIL) before searching.
 - **Gate to advance:** a draft locator/flow list exists (even if every entry is `[Pending Verification]`).
 
-## Phase 3 — Mandatory Live Verification (ALWAYS runs — never skipped)
-- Invoke **`live_explorer`** → Architect persona writes/extends a Playwright+Python script under `brain/scripts/` for the batch's functional area and runs it headless against the running app (`localhost:3000` / `localhost:8080`) to confirm every locator and flow from Phase 2 — **even ones Appendix A already documents.**
+## Phase 3 — Mandatory Live Verification & Exploration (ALWAYS runs — never skipped)
+- Invoke **`live_explorer`** → Architect persona uses live browser tools (`postqode_browser_agent` / live browser navigation) to explore, inspect, and verify the live app (`localhost:3000` / `localhost:8080`), and writes/extends a Playwright+Python script under `brain/scripts/` for the batch's functional area to confirm every locator and flow from Phase 2 — **even ones Appendix A already documents.**
 - **Rules needed at this phase:** read `.postqode/rules/general-conventions.md §12` (Credentials Handling — never hardcode demo creds inline) and `.postqode/rules/general-conventions.md §4` (Terminal-Execution Policy — autonomous script execution is allowed) before writing/running the script.
 - **Gate to advance:** every locator/flow in the draft has a corresponding pass/fail evidence line; all failures are resolved (locator corrected) or converted to a genuine business-rule Open Question (never left silently unresolved).
 

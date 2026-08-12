@@ -11,7 +11,7 @@ This file defines the universal conventions every `.postqode` workflow and skill
 
 ## 1. RIL Operating Contract & Context Boundaries
 
-- **Lessons-Learned Guardrail:** Obey `.postqode/rules/lessons-learned.md` before declaring blockers, writing verification scripts, or starting live browser checks. The anti-tunnel-vision checkpoint (§6 of that file) is mandatory at every phase boundary and blocker/escalation point.
+- **Lessons-Learned Guardrail:** Obey `.postqode/rules/lessons-learned.md` before declaring blockers, writing verification scripts, or starting live browser exploration/checks. The anti-tunnel-vision checkpoint (§6 of that file) is mandatory at every phase boundary and blocker/escalation point.
 - **Strict Boundary:** Load only the specific functional area's `functional-map/<area>.md` and `component-catalog/<area>.md` pointed to by `task-resolver.md`. Never scan the entire `.repository-intelligence/` directory for a single-area task.
 - **Write-back is mandatory:** Persist newly discovered/verified locators, flows, and rules to the RIL before concluding a batch.
 - **Context Budget:** Prefer minimal sufficient reads; check `task-resolver.md` first.
@@ -54,7 +54,7 @@ This file defines the universal conventions every `.postqode` workflow and skill
 ## 9. Persona Activation Logging
 - Print `[Persona Activation] Activating <Persona> Persona` when switching persona context within the merged workflow (`02-plan-and-automate.md`). Personas:
   - **Ingestion Specialist** — Phase 1 (parsing `docs/e2e-test-cases.md`).
-  - **Architect** — Phases 2–5 (static enrichment, mandatory live verification, plan finalization, plan QA review). **Live verification (Phase 3) is always the Architect's responsibility, never skipped, never delegated to the Developer persona.**
+  - **Architect** — Phases 2–5 (static enrichment, mandatory live exploration & verification, plan finalization, plan QA review). **Live exploration & verification (Phase 3) is always the Architect's responsibility (explicitly utilizing browser tools like `postqode_browser_agent` and Playwright scripts), never skipped, never delegated to the Developer persona.**
   - **Developer** — Phases 6–8 (code generation, autonomous run/debug, code QA review).
   - **RIL Archivist** — Phase 9 (write-back).
 - Bypassing persona activation logging to skip a review gate is a workflow violation.

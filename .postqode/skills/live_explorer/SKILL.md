@@ -1,11 +1,11 @@
 ---
 name: live_explorer
-description: "MANDATORY Architect-owned skill. Runs Playwright+Python headless verification scripts against the running app to confirm every locator/flow in the draft plan before it is marked resolved. Always runs — never skipped, even when Appendix A already documents a selector."
+description: "MANDATORY Architect-owned skill. Performs live exploration using browser tools (postqode_browser_agent) and Playwright+Python verification scripts against the running app to confirm every locator/flow in the draft plan before it is marked resolved. Always runs — never skipped, even when Appendix A already documents a selector."
 ---
 
 # Live Explorer Skill
 
-This is the most important behavioral change from the source system: verification is **mandatory for every batch**, not a last-resort fallback. It is explicitly the **Architect persona's** responsibility (Phase 3 of `02-plan-and-automate.md`), and it uses the exact same Playwright+Python stack that the final automation runs on — a verification script can become the first draft of a page object.
+This is the most important behavioral change from the source system: verification and live exploration are **mandatory for every batch**, not a last-resort fallback. It is explicitly the **Architect persona's** responsibility (Phase 3 of `02-plan-and-automate.md`). The Architect explicitly uses live browser tools (`postqode_browser_agent` / live browser navigation) to inspect the DOM, verify interactive element states, and explore complex flows, paired with Playwright+Python verification scripts under `brain/scripts/` that serve as durable verification artifacts and first drafts for page objects.
 
 ## Context Requirements
 - The draft `plan.md`'s `## Locator / Flow Verification Checklist` (from `enrichment_engine` Phase 2)
@@ -25,8 +25,9 @@ _(read on-demand — only when a capability below cites it, never pre-loaded)_
 - Confirm the app is reachable: `curl -s http://localhost:8080/health` and `curl -s http://localhost:3000/login` (or equivalent quick check). If not running, ask the user to start it (`./scripts/start-all.sh` or similar) — this is a legitimate mid-run pause, not a workflow failure.
 - Confirm demo credentials are available (from `docs/e2e-test-cases.md` §1.1: `admin/Admin@123`, `user/User@123`) — load them via `utils/config.py`/`.env`, never hardcode inline in the verification script beyond a first draft that gets sanitized before commit (see `general-conventions.md §12`).
 
-### 1. Ledger Check & Script Reuse (Mandatory First Step)
-- Before writing any script, read `.repository-intelligence/exploration-ledger.json` for an existing script covering the batch's functional area.
+### 1. Mandatory Live Browser Exploration & Script Setup
+- **Live Browser Exploration:** Use `postqode_browser_agent` (navigate via `goto`, snapshot DOM, interact with elements, inspect accessibility tree, capture console/network errors) to directly inspect and explore the live web application on `http://localhost:3000`. Use the live browser to discover exact DOM structures, visual states, route changes, dynamic modals, and overlay mechanics before finalizing locators.
+- **Ledger Check & Script Reuse:** Read `.repository-intelligence/exploration-ledger.json` for an existing script covering the batch's functional area.
 - **Reuse boundary:** you may extend an existing script only if the new checks are within the same functional area already recorded in its ledger entry. A different area → write a new script, don't repurpose an unrelated one.
 - If no matching script exists, create `brain/scripts/verify_<area>.py` from `references/script-template.py`.
 
@@ -36,7 +37,9 @@ For every element/flow in the draft plan's checklist, **regardless of whether Ap
 2. **Flows:** actually perform the action (click login, submit a dialog, approve an order) and confirm the described transition happens (redirect, toast, row/badge update) — not just that the trigger element exists.
 3. **Dynamic/async behavior:** confirm debounce timing, overlay settle timing, and optimistic-update behavior actually match Appendix B's documented patterns on the live app (timings can drift from docs).
 
-### 3. Script Requirements
+### 3. Script Requirements & Browser Tool Integration
+- **Live Browser Tool Usage:** Interactive exploration via `postqode_browser_agent` is the primary mechanism to explore unknown DOM states, verify complex interaction chains, and inspect computed properties.
+- **Script Generation:** Every live exploration finding must be codified into a Python + Playwright sync script (`brain/scripts/verify_<area>.py`) for repeatable execution and automated CI/local verification.
 - Python + Playwright **sync API**, headless by default (env var toggle for headed debugging).
 - Location: `brain/scripts/verify_<area>.py`, one script per functional area, extended across batches (never one script per test case).
 - Each run prints one structured line per checked item:
