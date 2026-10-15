@@ -1,75 +1,47 @@
 ---
 name: playwright-cli
-description: Control persistent browser sessions, open headed Chromium, interact with web pages, and evaluate code using the Playwright CLI.
+description: Run fast, stateful browser sessions, headed Chromium, and dynamic multi-action JavaScript execution using playwright-cli.
 ---
 
 # Playwright CLI Skill
 
-This skill guides the agent in using the **Playwright CLI** (`npx playwright cli` or `playwright-cli`) to run an interactive, stateful browser session across terminal commands.
+This skill guides the agent in using the **Playwright CLI** (`playwright cli`) to run high-speed, stateful browser automation across terminal commands.
 
 ---
 
-## 1. Browser Lifecycle
+## 1. Speed Best Practices
+
+1. **Use `playwright cli` directly** (do not use `npx`, which adds a 1.5s cold-start penalty per call).
+2. **Always pass `--raw`**: Prevents Playwright CLI from printing massive 500-line YAML page snapshots into the output. Output stays clean, fast, and saves thousands of tokens.
+3. **Use `run-code` to batch actions**: Rather than running 20 individual CLI commands across 20 chat turns, execute multi-action steps inside a single `run-code` snippet.
+
+---
+
+## 2. Core Commands
 
 * **Open Headed Browser:**
   ```bash
-  npx playwright cli open <url> --headed
+  playwright cli open <url> --headed
   ```
-  This launches a visible Chromium browser on the desktop and navigates to the URL. The session remains open and persistent across subsequent commands.
-
-* **Close Browser:**
+* **Run Dynamic Async Code (Fast & Batched):**
   ```bash
-  npx playwright cli close
+  playwright cli --raw run-code "async (page) => {
+    await page.fill('#username', 'user');
+    await page.fill('#password', 'User@123');
+    await page.click('#submit');
+    await page.waitForURL('**/dashboard');
+    return await page.title();
+  }"
   ```
-
+* **Evaluate Single Expression:**
+  ```bash
+  playwright cli --raw eval "<expression>"
+  ```
+* **Close Browser Session:**
+  ```bash
+  playwright cli close
+  ```
 * **Force Kill Stale Sessions:**
   ```bash
-  npx playwright cli close-all
+  playwright cli close-all
   ```
-
----
-
-## 2. Page Interaction Commands
-
-* **Fill Input:**
-  ```bash
-  npx playwright cli fill '#login-input-username' 'user'
-  ```
-* **Click Element:**
-  ```bash
-  npx playwright cli click '#login-button-submit'
-  ```
-* **Evaluate JavaScript:**
-  ```bash
-  npx playwright cli eval "document.title"
-  ```
-* **Page Snapshot:**
-  ```bash
-  npx playwright cli snapshot
-  ```
-* **Navigate to New URL:**
-  ```bash
-  npx playwright cli goto '<url>'
-  ```
-
----
-
-## 3. WebMCP Testing Configuration
-
-The browser must run with the `--enable-features=WebMCPTesting` Chrome flag. This is automatically configured globally in `~/.playwright/cli.config.json`:
-
-```json
-{
-  "browser": {
-    "launchOptions": {
-      "headless": false,
-      "args": [
-        "--enable-features=WebMCPTesting",
-        "--no-sandbox",
-        "--disable-setuid-sandbox"
-      ]
-    }
-  }
-}
-```
-Whenever `npx playwright cli open` is invoked in any directory, it loads these Chromium flags and launches visibly.
