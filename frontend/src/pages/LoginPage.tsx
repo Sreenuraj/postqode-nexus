@@ -66,13 +66,22 @@ export const LoginPage: React.FC = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            id="login-form"
+            toolname="user_login"
+            tooldescription="Authenticate into PostQode Nexus with username and password"
+            toolautosubmit=""
+            onSubmit={handleSubmit}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="login-input-username">Username</Label>
               <Input
                 id="login-input-username"
+                name="username"
                 type="text"
                 placeholder="Enter your username"
+                toolparamdescription="Username (e.g. admin or user)"
                 value={username}
                 onChange={(e) => {
                   setUsername(e.target.value);

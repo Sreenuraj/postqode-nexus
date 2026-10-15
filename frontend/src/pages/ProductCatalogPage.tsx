@@ -19,6 +19,7 @@ import { Plus, Search, MoreVertical, Edit, Trash2, RefreshCw, ShoppingCart } fro
 import { toast } from 'sonner';
 import { ProductFormDialog } from '../components/ProductFormDialog';
 import { DeleteProductDialog } from '../components/DeleteProductDialog';
+import { useWebMcpTool } from '../hooks/useWebMcpTool';
 
 export const ProductCatalogPage: React.FC = () => {
   const { isAdmin } = useAuth();
@@ -107,6 +108,96 @@ export const ProductCatalogPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [search]);
 
+  // WebMCP: Tool to search catalog products programmatically
+  useWebMcpTool(
+    {
+      name: 'search_products',
+      description: 'Search products in catalog with optional query, category, status, and sorting.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          search: { type: 'string', description: 'Keyword to search in product name or SKU' },
+          categoryId: { type: 'string', description: 'Filter by category UUID' },
+          status: { type: 'string', enum: ['ALL', 'ACTIVE', 'LOW_STOCK', 'OUT_OF_STOCK'] },
+          sortBy: { type: 'string', enum: ['name', 'price', 'quantity', 'status'] },
+          sortOrder: { type: 'string', enum: ['ASC', 'DESC'] },
+        },
+      },
+      annotations: {
+        readOnlyHint: true,
+        consequentialHint: false,
+      },
+      execute: async (params: any = {}) => {
+        if (params.search !== undefined) setSearch(params.search);
+        if (params.status) setStatusFilter(params.status);
+        if (params.categoryId) setCategoryFilter(params.categoryId);
+        const res = await productApi.getAll({
+          search: params.search ?? search,
+          status: params.status && params.status !== 'ALL' ? params.status : (statusFilter !== 'ALL' ? statusFilter : undefined),
+          categoryId: params.categoryId && params.categoryId !== 'ALL' ? params.categoryId : (categoryFilter !== 'ALL' ? categoryFilter : undefined),
+          sortBy: params.sortBy || sortBy,
+          sortOrder: params.sortOrder || sortOrder,
+          pageSize: 10,
+        });
+        return res.content || res.items || [];
+      },
+    },
+    [search, statusFilter, categoryFilter, sortBy, sortOrder]
+  );
+
+  // WebMCP: Tool to get specific product details
+  useWebMcpTool(
+    {
+      name: 'get_product_details',
+      description: 'Get details, price, and available inventory for a specific product ID.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          productId: { type: 'string', description: 'Product UUID' },
+        },
+        required: ['productId'],
+      },
+      annotations: {
+        readOnlyHint: true,
+      },
+      execute: async ({ productId }: { productId: string }) => {
+        return await productApi.getById(productId);
+      },
+    },
+    []
+  );
+
+  // WebMCP: Tool to place an order directly via AI agent
+  useWebMcpTool(
+    {
+      name: 'place_order',
+      description: 'Place an order for a product by ID and quantity. Updates inventory.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          productId: { type: 'string', description: 'Product UUID' },
+          quantity: { type: 'number', description: 'Number of units to purchase (min 1)' },
+        },
+        required: ['productId', 'quantity'],
+      },
+      annotations: {
+        readOnlyHint: false,
+        consequentialHint: true, // Consequential: marks financial/order placement action
+      },
+      execute: async ({ productId, quantity }: { productId: string; quantity: number }) => {
+        const order = await orderApi.createOrder(productId, quantity);
+        fetchProducts();
+        toast.success(`Agent placed order for ${quantity} unit(s)!`);
+        return {
+          status: 'success',
+          order,
+          message: `Order successfully placed for ${quantity} unit(s).`,
+        };
+      },
+    },
+    []
+  );
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: any; icon: string }> = {
       ACTIVE: { variant: 'default', icon: '🟢' },
@@ -173,7 +264,15 @@ export const ProductCatalogPage: React.FC = () => {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
+        <form
+          toolname="search_catalog"
+          tooldescription="Search and filter product catalog by keyword"
+          className="relative flex-1"
+          onSubmit={(e) => {
+            e.preventDefault();
+            fetchProducts();
+          }}
+        >
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
           <Input
             id="catalog-input-search"
@@ -181,8 +280,9 @@ export const ProductCatalogPage: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="pl-10"
+            toolparamdescription="Search query keyword for product name or SKU"
           />
-        </div>
+        </form>
 
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger id="catalog-select-status" className="w-full sm:w-[180px]">
@@ -382,39 +482,55 @@ export const ProductCatalogPage: React.FC = () => {
           <DialogHeader>
             <DialogTitle>Buy Product</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Product: {selectedProduct?.name}</p>
-              <p className="text-sm text-slate-500">Price: ${selectedProduct?.price.toFixed(2)}</p>
-              <p className="text-sm text-slate-500">Available: {selectedProduct?.quantity}</p>
+          <form
+            id="catalog-form-buy"
+            toolname="place_order_form"
+            tooldescription="Submit purchase order for the selected product"
+            toolautosubmit=""
+            onSubmit={async (e) => {
+              e.preventDefault();
+              await handleBuy();
+              if ((e.nativeEvent as any)?.agentInvoked && (e.nativeEvent as any)?.respondWith) {
+                (e.nativeEvent as any).respondWith(Promise.resolve({ status: 'success' }));
+              }
+            }}
+          >
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <p className="text-sm font-medium">Product: {selectedProduct?.name}</p>
+                <p className="text-sm text-slate-500">Price: ${selectedProduct?.price.toFixed(2)}</p>
+                <p className="text-sm text-slate-500">Available: {selectedProduct?.quantity}</p>
+              </div>
+              <div className="space-y-2">
+                <label htmlFor="quantity" className="text-sm font-medium">
+                  Quantity
+                </label>
+                <Input
+                  id="quantity"
+                  name="quantity"
+                  type="number"
+                  min="1"
+                  max={selectedProduct?.quantity}
+                  value={buyQuantity}
+                  toolparamdescription="Quantity of product units to purchase"
+                  onChange={(e) => setBuyQuantity(Math.max(1, Math.min(selectedProduct?.quantity || 1, parseInt(e.target.value) || 1)))}
+                />
+              </div>
+              <div className="border-t pt-4">
+                <p className="text-lg font-semibold">
+                  Total: ${((selectedProduct?.price || 0) * buyQuantity).toFixed(2)}
+                </p>
+              </div>
             </div>
-            <div className="space-y-2">
-              <label htmlFor="quantity" className="text-sm font-medium">
-                Quantity
-              </label>
-              <Input
-                id="quantity"
-                type="number"
-                min="1"
-                max={selectedProduct?.quantity}
-                value={buyQuantity}
-                onChange={(e) => setBuyQuantity(Math.max(1, Math.min(selectedProduct?.quantity || 1, parseInt(e.target.value) || 1)))}
-              />
-            </div>
-            <div className="border-t pt-4">
-              <p className="text-lg font-semibold">
-                Total: ${((selectedProduct?.price || 0) * buyQuantity).toFixed(2)}
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setBuyDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleBuy} disabled={buyQuantity <= 0 || buyQuantity > (selectedProduct?.quantity || 0)}>
-              Place Order
-            </Button>
-          </DialogFooter>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setBuyDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={buyQuantity <= 0 || buyQuantity > (selectedProduct?.quantity || 0)}>
+                Place Order
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>

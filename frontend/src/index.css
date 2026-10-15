@@ -83,3 +83,30 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* WebMCP Agent Visual Actuation Feedback */
+:tool-form-active,
+form[data-webmcp-active="true"] {
+  outline: 2px solid #3b82f6 !important;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.45) !important;
+  transition: all 0.3s ease-in-out;
+}
+
+:tool-submit-active,
+button[data-webmcp-active="true"] {
+  outline: 2px solid #3b82f6 !important;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.6) !important;
+  animation: webmcp-pulse 1.2s infinite ease-in-out;
+}
+
+@keyframes webmcp-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.9;
+  }
+}
+

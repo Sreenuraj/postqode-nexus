@@ -9,7 +9,13 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
     "test": "vitest",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui",
+    "demo:traditional": "SLOWMO=500 playwright test e2e/demo-traditional.spec.ts --headed",
+    "demo:webmcp": "playwright test e2e/demo-webmcp.spec.ts --headed",
+    "demo": "SLOWMO=400 playwright test e2e/demo-traditional.spec.ts e2e/demo-webmcp.spec.ts --headed"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -42,6 +48,7 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
     "@testing-library/user-event": "^14.5.1",

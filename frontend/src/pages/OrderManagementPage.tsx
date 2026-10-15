@@ -6,6 +6,7 @@ import { Badge } from '../components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../components/ui/alert-dialog';
 import { toast } from 'sonner';
 import { Check, X, ShoppingCart } from 'lucide-react';
+import { useWebMcpTool } from '../hooks/useWebMcpTool';
 
 interface Order {
   id: string;
@@ -33,6 +34,87 @@ export const OrderManagementPage: React.FC = () => {
   const [isApproveDialogOpen, setIsApproveDialogOpen] = useState(false);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+  // WebMCP: Tool to get order list
+  useWebMcpTool(
+    {
+      name: 'get_orders',
+      description: 'Retrieve order list with optional status filter (PENDING, APPROVED, REJECTED, CANCELLED).',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          status: {
+            type: 'string',
+            enum: ['ALL', 'PENDING', 'APPROVED', 'REJECTED', 'CANCELLED'],
+            description: 'Filter orders by status',
+          },
+        },
+      },
+      annotations: {
+        readOnlyHint: true,
+      },
+      execute: async ({ status }: { status?: string } = {}) => {
+        const data = await orderApi.getAllOrders();
+        if (status && status !== 'ALL') {
+          return data.filter((o: Order) => o.status === status);
+        }
+        return data;
+      },
+    },
+    []
+  );
+
+  // WebMCP: Tool to approve an order
+  useWebMcpTool(
+    {
+      name: 'approve_order',
+      description: 'Approve a pending customer order by order ID.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          orderId: { type: 'string', description: 'Order UUID' },
+        },
+        required: ['orderId'],
+      },
+      annotations: {
+        readOnlyHint: false,
+        consequentialHint: true,
+      },
+      execute: async ({ orderId }: { orderId: string }) => {
+        const res = await orderApi.approveOrder(orderId);
+        loadOrders();
+        toast.success(`Agent approved order: ${orderId}`);
+        return { status: 'success', message: `Order ${orderId} approved successfully`, data: res };
+      },
+    },
+    []
+  );
+
+  // WebMCP: Tool to reject an order
+  useWebMcpTool(
+    {
+      name: 'reject_order',
+      description: 'Reject a pending customer order by order ID.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          orderId: { type: 'string', description: 'Order UUID' },
+        },
+        required: ['orderId'],
+      },
+      annotations: {
+        readOnlyHint: false,
+        consequentialHint: true,
+      },
+      execute: async ({ orderId }: { orderId: string }) => {
+        const res = await orderApi.rejectOrder(orderId);
+        loadOrders();
+        toast.success(`Agent rejected order: ${orderId}`);
+        return { status: 'success', message: `Order ${orderId} rejected successfully`, data: res };
+      },
+    },
+    []
+  );
 
   useEffect(() => {
     loadOrders();

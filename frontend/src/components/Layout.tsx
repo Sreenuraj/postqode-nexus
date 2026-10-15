@@ -29,10 +29,122 @@ import {
   UserCog,
 } from 'lucide-react';
 
+import { useWebMcpTool } from '../hooks/useWebMcpTool';
+import { toast } from 'sonner';
+
 export const Layout: React.FC = () => {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Register WebMCP Global Navigation Tool
+  useWebMcpTool(
+    {
+      name: 'navigate_to_page',
+      description: 'Navigate to a specific page or section in PostQode Nexus.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          path: {
+            type: 'string',
+            description: 'Target path: /dashboard, /products, /categories, /users, /orders, /my-orders, /my-inventory, /insights, /command-center',
+            enum: [
+              '/dashboard',
+              '/products',
+              '/categories',
+              '/users',
+              '/orders',
+              '/my-orders',
+              '/my-inventory',
+              '/insights',
+              '/command-center',
+              '/preferences',
+            ],
+          },
+        },
+        required: ['path'],
+      },
+      annotations: {
+        readOnlyHint: false,
+        consequentialHint: false,
+      },
+      execute: ({ path }: { path: string }) => {
+        navigate(path);
+        return { status: 'success', currentPath: path, message: `Navigated to ${path}` };
+      },
+    },
+    [navigate]
+  );
+
+  // Register WebMCP User Context Tool
+  useWebMcpTool(
+    {
+      name: 'get_current_user_profile',
+      description: 'Returns the currently authenticated user profile, permissions, and role.',
+      inputSchema: {
+        type: 'object',
+        properties: {},
+      },
+      annotations: {
+        readOnlyHint: true,
+      },
+      execute: () => ({
+        username: user?.username,
+        email: user?.email,
+        role: user?.role,
+        isAdmin,
+        authenticated: !!user,
+      }),
+    },
+    [user, isAdmin]
+  );
+
+  // Register WebMCP Logout Tool
+  useWebMcpTool(
+    {
+      name: 'logout_user',
+      description: 'Log out the currently authenticated user and return to login.',
+      inputSchema: {
+        type: 'object',
+        properties: {},
+      },
+      annotations: {
+        readOnlyHint: false,
+        consequentialHint: true,
+      },
+      execute: async () => {
+        await logout();
+        navigate('/login');
+        return { status: 'success', message: 'User logged out successfully' };
+      },
+    },
+    [logout, navigate]
+  );
+
+  // Listen to WebMCP agent activation events for visual feedback during demos
+  React.useEffect(() => {
+    const handleActivated = (e: any) => {
+      const toolName = e.detail?.toolName || e.toolName;
+      if (toolName) {
+        toast.info(`🤖 AI Agent executing: ${toolName}`, {
+          duration: 3000,
+          id: `webmcp-${toolName}`,
+        });
+      }
+    };
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('toolactivated', handleActivated as EventListener);
+      document.modelContext?.addEventListener?.('toolactivated', handleActivated);
+    }
+
+    return () => {
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('toolactivated', handleActivated as EventListener);
+        document.modelContext?.removeEventListener?.('toolactivated', handleActivated);
+      }
+    };
+  }, []);
 
   const handleLogout = async () => {
     await logout();

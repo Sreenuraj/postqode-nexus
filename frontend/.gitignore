@@ -23,4 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Reference documentation (internal use only)
+# Playwright
+test-results/
+playwright-report/

@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Badge } from '../components/ui/badge';
 import { toast } from 'sonner';
 import { ShoppingCart, X } from 'lucide-react';
+import { useWebMcpTool } from '../hooks/useWebMcpTool';
 
 interface Order {
   id: string;
@@ -24,6 +25,25 @@ interface Order {
 export const MyOrdersPage: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // WebMCP: Tool to get user order history
+  useWebMcpTool(
+    {
+      name: 'get_my_orders',
+      description: 'Retrieve current user order history and statuses (PENDING, APPROVED, REJECTED, CANCELLED).',
+      inputSchema: {
+        type: 'object',
+        properties: {},
+      },
+      annotations: {
+        readOnlyHint: true,
+      },
+      execute: async () => {
+        return await orderApi.getMyOrders();
+      },
+    },
+    []
+  );
 
   useEffect(() => {
     loadOrders();
