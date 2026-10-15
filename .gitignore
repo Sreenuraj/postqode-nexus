@@ -44,3 +44,4 @@ coverage/
 docs/insight_CC_myactivity.md
 docs/request_product.md
 docs/preferences_reference.md
+.playwright-cli/

@@ -1,71 +1,75 @@
 ---
 name: playwright-cli
-description: Verify and install the latest Playwright CLI (>= 1.64.0) with Chrome WebMCP flag support, and execute headed/headless browser tests.
+description: Control persistent browser sessions, open headed Chromium, interact with web pages, and evaluate code using the Playwright CLI.
 ---
 
-# Playwright CLI & WebMCP Setup Skill
+# Playwright CLI Skill
 
-This skill ensures that Playwright CLI (version 1.64.0 or higher) is installed, configured with the Chrome WebMCP testing flag, and ready to execute browser tests.
-
----
-
-## 1. Verify Installation
-
-Check the installed Playwright CLI version in `frontend/`:
-
-```bash
-cd frontend
-npx playwright --version
-```
-
-### Minimum Version Requirement
-* **Playwright $\ge$ 1.64.0** is required for Chromium builds that support Google Chrome's WebMCP (`document.modelContext`) API.
+This skill guides the agent in using the **Playwright CLI** (`npx playwright cli` or `playwright-cli`) to run an interactive, stateful browser session across terminal commands.
 
 ---
 
-## 2. Install or Upgrade (If Missing or Outdated)
+## 1. Browser Lifecycle
 
-If Playwright is not installed or version is below `1.64.0`, run:
+* **Open Headed Browser:**
+  ```bash
+  npx playwright cli open <url> --headed
+  ```
+  This launches a visible Chromium browser on the desktop and navigates to the URL. The session remains open and persistent across subsequent commands.
 
-```bash
-cd frontend
-npm install -D @playwright/test@latest
-npx playwright install chromium
-```
+* **Close Browser:**
+  ```bash
+  npx playwright cli close
+  ```
+
+* **Force Kill Stale Sessions:**
+  ```bash
+  npx playwright cli close-all
+  ```
 
 ---
 
-## 3. Verify WebMCP Browser Launch Configuration
+## 2. Page Interaction Commands
 
-WebMCP requires Chromium to be launched with the `--enable-features=WebMCPTesting` switch. Ensure `frontend/playwright.config.ts` includes:
+* **Fill Input:**
+  ```bash
+  npx playwright cli fill '#login-input-username' 'user'
+  ```
+* **Click Element:**
+  ```bash
+  npx playwright cli click '#login-button-submit'
+  ```
+* **Evaluate JavaScript:**
+  ```bash
+  npx playwright cli eval "document.title"
+  ```
+* **Page Snapshot:**
+  ```bash
+  npx playwright cli snapshot
+  ```
+* **Navigate to New URL:**
+  ```bash
+  npx playwright cli goto '<url>'
+  ```
 
-```typescript
-launchOptions: {
-  args: [
-    '--enable-features=WebMCPTesting',
-    '--no-sandbox',
-    '--disable-setuid-sandbox',
-  ],
+---
+
+## 3. WebMCP Testing Configuration
+
+The browser must run with the `--enable-features=WebMCPTesting` Chrome flag. This is automatically configured globally in `~/.playwright/cli.config.json`:
+
+```json
+{
+  "browser": {
+    "launchOptions": {
+      "headless": false,
+      "args": [
+        "--enable-features=WebMCPTesting",
+        "--no-sandbox",
+        "--disable-setuid-sandbox"
+      ]
+    }
+  }
 }
 ```
-
----
-
-## 4. Execution Commands
-
-| Mode | Command | Pacing |
-| :--- | :--- | :--- |
-| **Headed Demo (Smooth)** | `npm run demo:webmcp` | Headed, human-visible (~2s) |
-| **Headed Traditional Demo** | `npm run demo:traditional` | Headed, 500ms slowMo (~18s) |
-| **Both Side-by-Side** | `npm run demo` | Headed sequential |
-| **Headless E2E Suite** | `npm run test:e2e` | Fast, CI-ready (~17s) |
-| **Custom SlowMo** | `SLOWMO=600 npm run demo:traditional` | Custom delay per action |
-
----
-
-## 5. Visual Execution Mandate (Headed Mode)
-
-* When the user requests to **"open browser"**, **"navigate"**, **"run test"**, or **"demo"**, **ALWAYS run in HEADED mode** (`npm run demo:webmcp`, `npm run demo:traditional`, or `npm run demo`).
-* Users expect to visually see the Chromium browser launch on their desktop.
-* If writing a standalone Playwright script, **ALWAYS configure `headless: false` and `slowMo: 300`**. Never run headless unless the user explicitly types "headless".
-
+Whenever `npx playwright cli open` is invoked in any directory, it loads these Chromium flags and launches visibly.
