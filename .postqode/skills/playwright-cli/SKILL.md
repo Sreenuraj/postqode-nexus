@@ -1,19 +1,20 @@
 ---
 name: playwright-cli
-description: Run fast, stateful browser sessions, headed Chromium, and dynamic multi-action JavaScript execution using playwright-cli.
+description: Run stateful browser sessions, headed Chromium, and dynamic JavaScript execution using playwright-cli.
 ---
 
 # Playwright CLI Skill
 
-This skill guides the agent in using the **Playwright CLI** (`playwright cli`) to run high-speed, stateful browser automation across terminal commands.
+This skill guides the agent in using the **Playwright CLI** (`playwright cli`) to run high-speed browser automation.
 
 ---
 
-## 1. Speed Best Practices
+## 1. Speed & Portability Best Practices
 
-1. **Use `playwright cli` directly** (do not use `npx`, which adds a 1.5s cold-start penalty per call).
-2. **Always pass `--raw`**: Prevents Playwright CLI from printing massive 500-line YAML page snapshots into the output. Output stays clean, fast, and saves thousands of tokens.
-3. **Use `run-code` to batch actions**: Rather than running 20 individual CLI commands across 20 chat turns, execute multi-action steps inside a single `run-code` snippet.
+1. **Primary Command**: Use `playwright cli` directly. If not installed globally or in PATH, fallback to `npx -y playwright cli`.
+2. **Always pass `--raw`**: Prevents printing large default output, keeping responses clean and fast.
+3. **Use `run-code` to batch actions**: Execute sequential actions inside a single `run-code` snippet rather than running multiple CLI commands across separate turns.
+4. **Avoid `snapshot` when structured tools exist**: DOM snapshots dump large token trees and should only be used when an element locator cannot be determined through other means.
 
 ---
 
@@ -23,13 +24,10 @@ This skill guides the agent in using the **Playwright CLI** (`playwright cli`) t
   ```bash
   playwright cli open <url> --headed
   ```
-* **Run Dynamic Async Code (Fast & Batched):**
+* **Run Dynamic Async Code:**
   ```bash
   playwright cli --raw run-code "async (page) => {
-    await page.fill('#username', 'user');
-    await page.fill('#password', 'User@123');
-    await page.click('#submit');
-    await page.waitForURL('**/dashboard');
+    // page actions
     return await page.title();
   }"
   ```
@@ -45,3 +43,16 @@ This skill guides the agent in using the **Playwright CLI** (`playwright cli`) t
   ```bash
   playwright cli close-all
   ```
+
+---
+
+## 3. Environment Prerequisites & Self-Healing
+
+1. **Missing Playwright CLI**:
+   - If `playwright: command not found` occurs, switch to `npx -y playwright cli`.
+2. **Missing Browser Executable**:
+   - If browser launch fails with missing browser error (`Executable doesn't exist`):
+     ```bash
+     playwright install chromium || npx -y playwright install chromium
+     ```
+   - Then re-run the open command.

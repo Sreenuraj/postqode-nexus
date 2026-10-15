@@ -46,6 +46,10 @@ test.describe('WebMCP (Web Model Context Protocol) Integration', () => {
 
     const usernameInput = page.locator('#login-input-username');
     await expect(usernameInput).toHaveAttribute('toolparamdescription', /Username/i);
+
+    const passwordInput = page.locator('#login-input-password');
+    await expect(passwordInput).toHaveAttribute('name', 'password');
+    await expect(passwordInput).toHaveAttribute('toolparamdescription', /Password/i);
   });
 
   test('3. Authenticates and discovers Global WebMCP Tools on Layout', async ({ page }) => {
@@ -236,5 +240,31 @@ test.describe('WebMCP (Web Model Context Protocol) Integration', () => {
 
     // Verify UI toast notification appeared
     await expect(page.locator('text=Agent placed order')).toBeVisible({ timeout: 5000 });
+  });
+
+  test('9. Native Playwright page.webmcp API discovers tools and executes calls', async ({ page }) => {
+    await page.goto('/login');
+    const webmcp = (page as any).webmcp;
+    expect(webmcp).toBeDefined();
+
+    // Verify tools discovered via page.webmcp
+    const loginTools = await webmcp.tools();
+    expect(loginTools.some((t: any) => t.name === 'user_login')).toBe(true);
+
+    // Login via UI and verify page.webmcp on dashboard
+    await page.fill('#login-input-username', 'user');
+    await page.fill('#login-input-password', 'User@123');
+    await page.click('#login-button-submit');
+    await page.waitForURL('**/dashboard');
+
+    const dashboardTools = await webmcp.tools();
+    expect(dashboardTools.some((t: any) => t.name === 'get_current_user_profile')).toBe(true);
+    expect(dashboardTools.some((t: any) => t.name === 'navigate_to_page')).toBe(true);
+
+    // Call tool directly via native page.webmcp.callTool
+    const profile = await webmcp.callTool('get_current_user_profile', {});
+    const parsedProfile = parseToolResult(profile);
+    expect(parsedProfile.username).toBe('user');
+    expect(parsedProfile.authenticated).toBe(true);
   });
 });

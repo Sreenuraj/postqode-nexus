@@ -27,7 +27,7 @@ export default defineConfig({
         launchOptions: {
           slowMo,
           args: [
-            '--enable-features=WebMCPTesting',
+            '--enable-features=WebMCP,WebMCPTesting',
             '--no-sandbox',
             '--disable-setuid-sandbox',
           ],

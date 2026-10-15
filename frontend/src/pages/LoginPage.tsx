@@ -17,40 +17,55 @@ export const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const validate = () => {
-    const newErrors: { username?: string; password?: string } = {};
 
-    if (!username) {
-      newErrors.username = 'Username is required';
-    } else if (username.length < 3 || username.length > 50) {
-      newErrors.username = 'Username must be 3-50 characters';
-    }
-
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 4) {
-      newErrors.password = 'Password must be at least 4 characters';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!validate()) {
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const submitUsername = (formData.get('username') as string) || username;
+    const submitPassword = (formData.get('password') as string) || password;
+
+    const nativeEvt = (e.nativeEvent || e) as unknown as { respondWith?: (promise: Promise<any>) => void };
+
+    const validateInputs = () => {
+      const newErrors: { username?: string; password?: string } = {};
+      if (!submitUsername) {
+        newErrors.username = 'Username is required';
+      } else if (submitUsername.length < 3 || submitUsername.length > 50) {
+        newErrors.username = 'Username must be 3-50 characters';
+      }
+      if (!submitPassword) {
+        newErrors.password = 'Password is required';
+      } else if (submitPassword.length < 4) {
+        newErrors.password = 'Password must be at least 4 characters';
+      }
+      setErrors(newErrors);
+      return Object.keys(newErrors).length === 0;
+    };
+
+    if (!validateInputs()) {
+      if (typeof nativeEvt.respondWith === 'function') {
+        nativeEvt.respondWith(Promise.resolve(JSON.stringify({ error: 'Validation failed' })));
+      }
       return;
     }
 
     setLoading(true);
-    try {
-      await login(username, password);
-      navigate('/dashboard');
-    } catch (error) {
-      // Error is handled in AuthContext with toast
-    } finally {
-      setLoading(false);
+    const loginPromise = (async () => {
+      try {
+        await login(submitUsername, submitPassword);
+        setTimeout(() => navigate('/dashboard'), 50);
+        return JSON.stringify({ status: 'success', username: submitUsername });
+      } catch (error: any) {
+        return JSON.stringify({ status: 'error', message: error?.message || 'Login failed' });
+      } finally {
+        setLoading(false);
+      }
+    })();
+
+    if (typeof nativeEvt.respondWith === 'function') {
+      nativeEvt.respondWith(loginPromise);
     }
   };
 
@@ -102,8 +117,10 @@ export const LoginPage: React.FC = () => {
               <div className="relative">
                 <Input
                   id="login-input-password"
+                  name="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
+                  toolparamdescription="Password (e.g. User@123 or Admin@123)"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
