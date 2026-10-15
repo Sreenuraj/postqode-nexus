@@ -60,3 +60,12 @@ launchOptions: {
 | **Both Side-by-Side** | `npm run demo` | Headed sequential |
 | **Headless E2E Suite** | `npm run test:e2e` | Fast, CI-ready (~17s) |
 | **Custom SlowMo** | `SLOWMO=600 npm run demo:traditional` | Custom delay per action |
+
+---
+
+## 5. Visual Execution Mandate (Headed Mode)
+
+* When the user requests to **"open browser"**, **"navigate"**, **"run test"**, or **"demo"**, **ALWAYS run in HEADED mode** (`npm run demo:webmcp`, `npm run demo:traditional`, or `npm run demo`).
+* Users expect to visually see the Chromium browser launch on their desktop.
+* If writing a standalone Playwright script, **ALWAYS configure `headless: false` and `slowMo: 300`**. Never run headless unless the user explicitly types "headless".
+

@@ -90,3 +90,15 @@ graph TD
     J --> K[navigate_to_page '/my-orders']
     K --> L[get_my_orders: assert status == APPROVED]
 ```
+
+---
+
+## 5. Execution Reference (Always Headed)
+
+The project includes pre-built, fully validated scripts for this lifecycle in `frontend/`:
+* **Run WebMCP Flow (Headed):** `cd frontend && npm run demo:webmcp`
+* **Run Traditional Flow (Headed):** `cd frontend && npm run demo:traditional`
+* **Run Side-by-Side (Headed):** `cd frontend && npm run demo`
+
+Always run in **headed mode** so the browser opens visibly on screen for clients/users.
+
